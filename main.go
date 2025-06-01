@@ -32,7 +32,7 @@ func main() {
 
 	router.Router(app)
 
-	if err = app.Run(":8000"); err != nil {
+	if err = app.Run(":8080"); err != nil {
 		panic(err.Error())
 	}
 }
