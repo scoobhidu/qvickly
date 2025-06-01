@@ -1,0 +1,49 @@
+#version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: qvickly_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  backup:
+    image: postgres:latest
+    depends_on:
+      - postgres
+    volumes:
+      - postgres_data:/src/data
+      - postgres_backup:/backup
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: qvickly_dev
+    command: |
+      bash -c 'while true; do
+        pg_dump -h postgres -U postgres qvickly_dev > /backup/backup_$$(date +%Y%m%d_%H%M%S).sql;
+        sleep 86400;
+      done'
+
+volumes:
+  postgres_data:
+  postgres_backup:
+  redis_data:

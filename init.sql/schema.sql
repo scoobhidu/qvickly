@@ -1,0 +1,47 @@
+-- CREATE TABLE profile.users (
+--        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+--        phone_number VARCHAR(15) UNIQUE NOT NULL,
+--        email VARCHAR(100) unique not null,
+--        full_name VARCHAR(100),
+--
+--        google_id VARCHAR(255) unique, -- if logging in with Google
+--        profile_picture_url TEXT,
+--
+--     -- Preferences and metadata
+--        is_marketing_opted BOOLEAN DEFAULT TRUE,
+--        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- CREATE TABLE profile.addresses (
+--     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+--     user_id UUID REFERENCES profile.users(id) ON DELETE CASCADE,
+--     label VARCHAR(50), -- e.g. "Home", "Work"
+--     address_line1 TEXT NOT NULL,
+--     address_line2 TEXT,
+--     city VARCHAR(100),
+--     state VARCHAR(100) not null,
+--     postal_code VARCHAR(20) not null,
+--     country VARCHAR(100) DEFAULT 'India',
+--     latitude DECIMAL(9,6) not null,
+--     longitude DECIMAL(9,6) not null,
+--     is_default BOOLEAN DEFAULT TRUE,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- CREATE TABLE sso.user_sessions (
+--     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+--
+--     user_id UUID NOT NULL REFERENCES profile.users(id) ON DELETE CASCADE,
+--
+--     refresh_token TEXT NOT NULL UNIQUE,  -- stored hashed (recommended)
+--     refresh_token_expires_at TIMESTAMP NOT NULL,
+--
+--     ip_address TEXT,
+--     user_agent TEXT,
+--     device_info jsonb,
+--
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );

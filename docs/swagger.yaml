@@ -1,0 +1,656 @@
+definitions:
+  send_otp.Request:
+    properties:
+      phone:
+        description: 'E.164 format: +1234567890'
+        example: "+918010201921"
+        type: string
+    required:
+    - phone
+    type: object
+  update_order_status.UpdateOrderStatusRequest:
+    properties:
+      order_id:
+        type: string
+      status:
+        type: string
+    type: object
+  update_order_status.UpdateOrderStatusResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  vendors.AddItemToInventoryRequest:
+    properties:
+      item_id:
+        example: 456
+        type: integer
+      price_override:
+        example: 11.99
+        minimum: 0
+        type: number
+      stock_quantity:
+        example: 50
+        minimum: 0
+        type: integer
+    required:
+    - item_id
+    - stock_quantity
+    type: object
+  vendors.Category:
+    properties:
+      id:
+        example: 5
+        type: integer
+      name:
+        example: Pizza
+        type: string
+    type: object
+  vendors.CompleteVendorProfile:
+    properties:
+      account_type:
+        enum:
+        - basic
+        - premium
+        - enterprise
+        example: premium
+        type: string
+      address:
+        example: 123 Main Street, Downtown, New York, NY 10001
+        type: string
+      business_name:
+        example: Smith's Fresh Market LLC
+        type: string
+      closing_time:
+        example: "2000-01-01T21:00:00Z"
+        type: string
+      email:
+        example: john.smith@freshmarket.com
+        format: email
+        type: string
+      gstin:
+        example: 22AAAAA0000A1Z5
+        type: string
+      image_s3_url:
+        example: https://my-bucket.s3.amazonaws.com/vendors/store-123.jpg
+        type: string
+      latitude:
+        example: 40.7128
+        maximum: 90
+        minimum: -90
+        type: number
+      live_status:
+        example: true
+        type: boolean
+      longitude:
+        example: -74.006
+        maximum: 180
+        minimum: -180
+        type: number
+      opening_time:
+        example: "2000-01-01T09:00:00Z"
+        type: string
+      owner_name:
+        example: John Smith
+        type: string
+      phone:
+        example: "+1234567890"
+        type: string
+    type: object
+  vendors.InventorySummary:
+    properties:
+      in_stock_items:
+        example: 135
+        type: integer
+      out_of_stock_items:
+        example: 15
+        type: integer
+      total_items:
+        example: 150
+        type: integer
+    type: object
+  vendors.OrderDetailsResponse:
+    properties:
+      customer_address:
+        example: 123 Main St, Apt 4B, New York, NY 10001
+        type: string
+      customer_name:
+        example: Jane Smith
+        type: string
+      delivered_by_time:
+        example: "2025-05-30T15:00:00Z"
+        type: string
+      delivery_partner_name:
+        example: John Delivery
+        type: string
+      delivery_partner_phone:
+        example: "+1234567890"
+        type: string
+      delivery_partner_pin:
+        example: "1234"
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/vendors.OrderItem'
+        type: array
+      order_created_time:
+        example: "2025-05-30T13:30:00Z"
+        type: string
+      order_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      order_status:
+        enum:
+        - pending
+        - accepted
+        - packed
+        - ready
+        - completed
+        - cancelled
+        - rejected
+        example: packed
+        type: string
+      order_total_amount:
+        example: 45.99
+        type: number
+      pack_by_time:
+        example: "2025-05-30T14:30:00Z"
+        type: string
+      paid_by_time:
+        example: "2025-05-30T13:45:00Z"
+        type: string
+    type: object
+  vendors.OrderItem:
+    properties:
+      item_id:
+        example: 1
+        type: integer
+      item_image_url:
+        example: https://example.com/images/margherita-pizza.jpg
+        type: string
+      item_name:
+        example: Margherita Pizza
+        type: string
+      qty_ordered:
+        example: 2
+        minimum: 1
+        type: integer
+    type: object
+  vendors.OrderListItem:
+    properties:
+      customer_name:
+        example: John Doe
+        type: string
+      delivered_by_time:
+        example: "2025-05-30T15:00:00Z"
+        type: string
+      order_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      order_status:
+        enum:
+        - pending
+        - accepted
+        - packed
+        - ready
+        - completed
+        - cancelled
+        - rejected
+        example: packed
+        type: string
+      order_time_placed:
+        example: "2025-05-30T13:30:00Z"
+        type: string
+      pack_by_time:
+        example: "2025-05-30T14:30:00Z"
+        type: string
+      pick_by_time:
+        example: "2025-05-30T14:45:00Z"
+        type: string
+      total_amount:
+        example: 45.99
+        type: number
+    type: object
+  vendors.OrdersListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/vendors.OrderListItem'
+        type: array
+      has_next:
+        example: true
+        type: boolean
+      has_prev:
+        example: false
+        type: boolean
+      limit:
+        example: 10
+        maximum: 10
+        minimum: 1
+        type: integer
+      page:
+        example: 1
+        minimum: 1
+        type: integer
+      success:
+        example: true
+        type: boolean
+      total_count:
+        example: 125
+        type: integer
+      total_pages:
+        example: 13
+        type: integer
+    type: object
+  vendors.TodayOrderSummary:
+    properties:
+      accepted:
+        example: 8
+        type: integer
+      cancelled:
+        example: 3
+        type: integer
+      completed:
+        example: 45
+        type: integer
+      packed:
+        example: 15
+        type: integer
+      pending:
+        example: 12
+        type: integer
+      ready:
+        example: 6
+        type: integer
+      rejected:
+        example: 2
+        type: integer
+    type: object
+  vendors.UpdateInventoryRequest:
+    properties:
+      is_available:
+        example: true
+        type: boolean
+      price_override:
+        example: 10.99
+        minimum: 0
+        type: number
+      stock_quantity:
+        example: 30
+        minimum: 0
+        type: integer
+    type: object
+  verify_otp.Request:
+    properties:
+      code:
+        type: string
+      device_info:
+        properties:
+          app_version:
+            type: string
+          device_id:
+            type: string
+          device_type:
+            type: string
+          os_version:
+            type: string
+        required:
+        - device_id
+        type: object
+      phone:
+        type: string
+    required:
+    - code
+    - device_info
+    - phone
+    type: object
+info:
+  contact: {}
+paths:
+  /api/auth/otp/sms:
+    post:
+      consumes:
+      - application/json
+      description: Send a one-time password (OTP) to the provided phone number via
+        SMS using Twilio Verify service
+      parameters:
+      - description: Phone number request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/send_otp.Request'
+      produces:
+      - application/json
+      responses: {}
+      summary: Send OTP via SMS
+      tags:
+      - authentication
+  /api/auth/otp/whatsapp:
+    post:
+      consumes:
+      - application/json
+      description: Send a one-time password (OTP) to the provided phone number via
+        WhatsApp using Twilio Verify service
+      parameters:
+      - description: Phone number request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/send_otp.Request'
+      produces:
+      - application/json
+      responses: {}
+      summary: Send OTP via WhatsApp
+      tags:
+      - authentication
+  /api/auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify the OTP code sent via SMS or WhatsApp, create user account
+        if new, and return JWT access token
+      parameters:
+      - description: OTP verification request containing phone number and code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/verify_otp.Request'
+      produces:
+      - application/json
+      responses: {}
+      summary: Verify OTP and Authenticate User
+      tags:
+      - authentication
+  /api/categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all available product categories for filtering and organization
+        purposes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Categories retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/vendors.Category'
+            type: array
+      summary: Get All Categories
+      tags:
+      - categories
+  /api/orders/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of an order to track its progress through the
+        fulfillment pipeline. Status changes help coordinate between vendors, delivery
+        partners, and customers.
+      parameters:
+      - description: Order status update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/update_order_status.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order status updated successfully
+          schema:
+            $ref: '#/definitions/update_order_status.UpdateOrderStatusResponse'
+      summary: Update Order Status
+      tags:
+      - orders
+  /api/vendor/order-detail:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve comprehensive details about a specific order including
+        delivery information, customer details, and all items
+      parameters:
+      - description: Order ID
+        in: query
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order details retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.OrderDetailsResponse'
+      summary: Get Vendor Order Details
+      tags:
+      - orders
+  /api/vendor/order-summary:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve order count statistics for the current day, grouped by
+        order status. Provides a quick overview of vendor's daily order performance.
+      parameters:
+      - description: Vendor ID
+        in: query
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Today's order summary retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.TodayOrderSummary'
+      summary: Get Vendor Today's Order Summary
+      tags:
+      - order-analytics
+  /api/vendor/orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of orders for a specific vendor. Maximum
+        10 orders per page to ensure optimal performance.
+      parameters:
+      - description: Vendor ID
+        in: query
+        name: vendor_id
+        required: true
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 10, max: 10)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Orders retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.OrdersListResponse'
+      summary: Get Vendor Orders List
+      tags:
+      - orders
+  /api/vendor/profile:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve complete profile information for a specific vendor including
+        business details, location, and operating hours
+      parameters:
+      - description: Vendor ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Vendor Profile Details
+      tags:
+      - vendor-profile
+    post:
+      consumes:
+      - application/json
+      description: Create a new vendor profile with complete business information,
+        location details, and operating hours
+      parameters:
+      - description: Complete vendor profile information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/vendors.CompleteVendorProfile'
+      produces:
+      - application/json
+      responses: {}
+      summary: Create Vendor Profile
+      tags:
+      - vendor-profile
+  /api/vendors/{vendor_id}/inventory:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve paginated inventory items for a specific vendor with filtering
+        and search capabilities
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 20, max: 50)'
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by category ID
+        in: query
+        name: category_id
+        type: string
+      - description: Search items by name or description
+        in: query
+        name: search
+        type: string
+      - description: Filter items by stock status
+        in: query
+        name: filter
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Vendor Inventory Items
+      tags:
+      - inventory
+    post:
+      consumes:
+      - application/json
+      description: Add a new item from the master catalog to the vendor's inventory
+        with initial stock quantity and optional price override
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      - description: Add item to inventory request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/vendors.AddItemToInventoryRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Add Item to Vendor Inventory
+      tags:
+      - inventory
+  /api/vendors/{vendor_id}/inventory/{item_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently remove an item from the vendor's inventory. This action
+        cannot be undone. The item will no longer be available for sale.
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      - description: Item ID to remove from inventory
+        in: path
+        name: item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Remove Item from Vendor Inventory
+      tags:
+      - inventory
+    put:
+      consumes:
+      - application/json
+      description: Update stock quantity, availability status, or price override for
+        an existing inventory item. All fields are optional - only provide fields
+        you want to update.
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      - description: Item ID to update
+        in: path
+        name: item_id
+        required: true
+        type: integer
+      - description: Inventory update request (all fields optional)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/vendors.UpdateInventoryRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update Inventory Item
+      tags:
+      - inventory
+  /api/vendors/{vendor_id}/inventory/summary:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve summary statistics of vendor's inventory including total
+        items, in-stock items, and out-of-stock items
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Inventory summary retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.InventorySummary'
+      summary: Get Vendor Inventory Summary
+      tags:
+      - inventory
+swagger: "2.0"
