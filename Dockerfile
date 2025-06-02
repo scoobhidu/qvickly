@@ -13,6 +13,19 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /app
 COPY --from=builder /app/main .
+
+ARG user
+ARG password
+ARG host
+ARG port
+ARG dbname
+ENV user="postgres"
+ENV password="postgres"
+ENV host="localhost"
+ENV port="5432"
+ENV dbname="postgres"
+
+#COPY /Users/rajatkr/GolandProjects/qvickly_new/pg.env /app
 # ... rest of your dockerfile
 
 # Create a non-root user
