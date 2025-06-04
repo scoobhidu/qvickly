@@ -7,12 +7,12 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: qvickly_dev
+      POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Expose to internet and other containers
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -21,6 +21,7 @@ services:
       retries: 3
     networks:
       - qvickly_network
+      - bridge  # Default bridge network for system-wide access
 
   redis:
     image: redis:latest
@@ -29,7 +30,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "6379:6379"  # Expose to internet and other containers
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -38,20 +39,21 @@ services:
       retries: 3
     networks:
       - qvickly_network
+      - bridge
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: qvickly_app
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"  # Direct access to Go app
     environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=qvickly_dev
+      - host=postgres
+      - port=5432
+      - user=postgres
+      - password=postgres
+      - dbname=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - GO_ENV=production
@@ -65,22 +67,26 @@ services:
       - ./logs:/app/logs
     networks:
       - qvickly_network
+      - bridge
 
   nginx:
     image: nginx:alpine
     container_name: qvickly_nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80"     # HTTP access
+      - "443:443"   # HTTPS access
+      - "8090:8090" # Alternative port for direct nginx access
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-#      - ./nginx/ssl:/etc/nginx/ssl:ro  # Optional: for SSL certificates
+#      - ./nginx/ssl:/etc/nginx/ssl:ro
+#      - ./nginx/logs:/var/log/nginx
     depends_on:
       - app
     restart: unless-stopped
     networks:
       - qvickly_network
+      - bridge
 
   backup:
     image: postgres:latest
@@ -93,10 +99,10 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: qvickly_dev
+      POSTGRES_DB: postgres
     command: |
       bash -c 'while true; do
-        pg_dump -h postgres -U postgres qvickly_dev > /backup/backup_$$(date +%Y%m%d_%H%M%S).sql;
+        pg_dump -h postgres -U postgres postgres > /backup/backup_$$(date +%Y%m%d_%H%M%S).sql;
         sleep 86400;
       done'
     networks:
@@ -107,6 +113,12 @@ volumes:
   postgres_backup:
   redis_data:
 
+# Define networks for maximum connectivity
 networks:
   qvickly_network:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: qvickly_bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
