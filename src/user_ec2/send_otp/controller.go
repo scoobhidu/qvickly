@@ -15,7 +15,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param request body Request true "Phone number request"
-// @Router /api/auth/otp/whatsapp [post]
+// @Router /otp/whatsapp [post]
 func SendWhatsappOTPController(c *gin.Context) {
 	var req Request
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -51,7 +51,7 @@ func SendWhatsappOTPController(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body Request true "Phone number request"
-// @Router /api/auth/otp/sms [post]
+// @Router /otp/sms [post]
 func SendSmsOTPController(c *gin.Context) {
 	var req Request
 	if err := c.ShouldBindJSON(&req); err != nil {

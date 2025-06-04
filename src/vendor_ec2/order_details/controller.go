@@ -13,7 +13,7 @@ import (
 // @Produce json
 // @Param order_id query string true "Order ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
 // @Success 200 {object} vendors.OrderDetailsResponse "Order details retrieved successfully"
-// @Router /api/vendor/order-detail [get]
+// @Router /vendor/orders/order_details [get]
 func GetVendorOrderDetail(ctx *gin.Context) {
 	//vars := mux.Vars(r)
 	orderID := ctx.Query("order_id")

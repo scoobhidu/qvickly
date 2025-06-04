@@ -9,13 +9,48 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/auth/otp/sms": {
+        "/categories": {
+            "get": {
+                "description": "Retrieve all available product categories for filtering and organization purposes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get All Categories",
+                "responses": {
+                    "200": {
+                        "description": "Categories retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/vendors.Category"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/otp/sms": {
             "post": {
                 "description": "Send a one-time password (OTP) to the provided phone number via SMS using Twilio Verify service",
                 "consumes": [
@@ -42,7 +77,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/auth/otp/whatsapp": {
+        "/otp/whatsapp": {
             "post": {
                 "description": "Send a one-time password (OTP) to the provided phone number via WhatsApp using Twilio Verify service",
                 "consumes": [
@@ -69,94 +104,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/auth/verify-otp": {
-            "post": {
-                "description": "Verify the OTP code sent via SMS or WhatsApp, create user account if new, and return JWT access token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "authentication"
-                ],
-                "summary": "Verify OTP and Authenticate User",
-                "parameters": [
-                    {
-                        "description": "OTP verification request containing phone number and code",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/verify_otp.Request"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/api/categories": {
-            "get": {
-                "description": "Retrieve all available product categories for filtering and organization purposes",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Get All Categories",
-                "responses": {
-                    "200": {
-                        "description": "Categories retrieved successfully",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/vendors.Category"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/orders/status": {
-            "put": {
-                "description": "Update the status of an order to track its progress through the fulfillment pipeline. Status changes help coordinate between vendors, delivery partners, and customers.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "orders"
-                ],
-                "summary": "Update Order Status",
-                "parameters": [
-                    {
-                        "description": "Order status update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/update_order_status.UpdateOrderStatusRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Order status updated successfully",
-                        "schema": {
-                            "$ref": "#/definitions/update_order_status.UpdateOrderStatusResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/vendor/order-detail": {
+        "/vendor/orders/order_details": {
             "get": {
                 "description": "Retrieve comprehensive details about a specific order including delivery information, customer details, and all items",
                 "consumes": [
@@ -188,39 +136,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/vendor/order-summary": {
-            "get": {
-                "description": "Retrieve order count statistics for the current day, grouped by order status. Provides a quick overview of vendor's daily order performance.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "order-analytics"
-                ],
-                "summary": "Get Vendor Today's Order Summary",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Vendor ID",
-                        "name": "vendor_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Today's order summary retrieved successfully",
-                        "schema": {
-                            "$ref": "#/definitions/vendors.TodayOrderSummary"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/vendor/orders": {
+        "/vendor/orders/recent_orders": {
             "get": {
                 "description": "Retrieve a paginated list of orders for a specific vendor. Maximum 10 orders per page to ensure optimal performance.",
                 "consumes": [
@@ -264,7 +180,73 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/vendor/profile": {
+        "/vendor/orders/summary": {
+            "get": {
+                "description": "Retrieve order count statistics for the current day, grouped by order status. Provides a quick overview of vendor's daily order performance.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order-analytics"
+                ],
+                "summary": "Get Vendor Today's Order Summary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vendor ID",
+                        "name": "vendor_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Today's order summary retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/vendors.TodayOrderSummary"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendor/orders/update_order_status": {
+            "put": {
+                "description": "Update the status of an order to track its progress through the fulfillment pipeline. Status changes help coordinate between vendors, delivery partners, and customers.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Update Order Status",
+                "parameters": [
+                    {
+                        "description": "Order status update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/update_order_status.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/update_order_status.UpdateOrderStatusResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendor/profile/details": {
             "get": {
                 "description": "Retrieve complete profile information for a specific vendor including business details, location, and operating hours",
                 "consumes": [
@@ -287,7 +269,9 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {}
-            },
+            }
+        },
+        "/vendor/profile/details/create": {
             "post": {
                 "description": "Create a new vendor profile with complete business information, location details, and operating hours",
                 "consumes": [
@@ -314,7 +298,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/vendors/{vendor_id}/inventory": {
+        "/vendor/{vendor_id}/inventory": {
             "get": {
                 "description": "Retrieve paginated inventory items for a specific vendor with filtering and search capabilities",
                 "consumes": [
@@ -401,7 +385,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/vendors/{vendor_id}/inventory/summary": {
+        "/vendor/{vendor_id}/inventory/summary": {
             "get": {
                 "description": "Retrieve summary statistics of vendor's inventory including total items, in-stock items, and out-of-stock items",
                 "consumes": [
@@ -433,7 +417,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/vendors/{vendor_id}/inventory/{item_id}": {
+        "/vendor/{vendor_id}/inventory/{item_id}": {
             "put": {
                 "description": "Update stock quantity, availability status, or price override for an existing inventory item. All fields are optional - only provide fields you want to update.",
                 "consumes": [
@@ -499,6 +483,33 @@ const docTemplate = `{
                         "name": "item_id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/verify-otp": {
+            "post": {
+                "description": "Verify the OTP code sent via SMS or WhatsApp, create user account if new, and return JWT access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authentication"
+                ],
+                "summary": "Verify OTP and Authenticate User",
+                "parameters": [
+                    {
+                        "description": "OTP verification request containing phone number and code",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/verify_otp.Request"
+                        }
                     }
                 ],
                 "responses": {}
@@ -932,11 +943,11 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
+	Version:          "1.0",
+	Host:             "3.110.123.73",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "",
+	Title:            "Qvickly APIs",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

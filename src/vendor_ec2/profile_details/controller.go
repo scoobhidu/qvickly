@@ -14,7 +14,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param id query string true "Vendor ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
-// @Router /api/vendor/profile [get]
+// @Router /vendor/profile/details [get]
 func GetVendorProfileDetails(context *gin.Context) {
 	vendorID := context.Query("id")
 	vendorDetails, err := postgres.GetVendorProfile(vendorID)
@@ -35,7 +35,7 @@ func GetVendorProfileDetails(context *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body vendors.CompleteVendorProfile true "Complete vendor profile information"
-// @Router /api/vendor/profile [post]
+// @Router /vendor/profile/details/create [post]
 func CreateVendorProfileDetails(context *gin.Context) {
 	var json vendors.CompleteVendorProfile
 	if err := context.ShouldBindJSON(&json); err != nil {

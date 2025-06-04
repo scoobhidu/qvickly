@@ -25,7 +25,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param request body Request true "OTP verification request containing phone number and code"
-// @Router /api/auth/verify-otp [post]
+// @Router /verify-otp [post]
 func VerifySMSOTP(c *gin.Context) {
 	var req Request
 	if err := c.ShouldBindJSON(&req); err != nil {

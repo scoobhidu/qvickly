@@ -18,7 +18,7 @@ import (
 // @Produce json
 // @Param request body UpdateOrderStatusRequest true "Order status update request"
 // @Success 200 {object} UpdateOrderStatusResponse "Order status updated successfully"
-// @Router /api/orders/status [put]
+// @Router /vendor/orders/update_order_status [put]
 func UpdateOrderStatusHandler(c *gin.Context) {
 	var req UpdateOrderStatusRequest
 

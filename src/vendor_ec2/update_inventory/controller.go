@@ -19,7 +19,7 @@ import (
 // @Param vendor_id path string true "Vendor ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
 // @Param item_id path int true "Item ID to update" example:"456"
 // @Param request body vendors.UpdateInventoryRequest true "Inventory update request (all fields optional)"
-// @Router /api/vendors/{vendor_id}/inventory/{item_id} [put]
+// @Router /vendor/{vendor_id}/inventory/{item_id} [put]
 func UpdateInventoryItemHandler(c *gin.Context) {
 	vendorID := c.Param("vendor_id")
 	itemIDStr := c.Param("item_id")

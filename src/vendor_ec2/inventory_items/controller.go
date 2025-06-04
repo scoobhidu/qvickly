@@ -21,7 +21,7 @@ import (
 // @Param category_id query string false "Filter by category ID" example:"5"
 // @Param search query string false "Search items by name or description" example:"pizza"
 // @Param filter query string false "Filter items by stock status" enums:"all,in_stock,out_of_stock" default:"all" example:"in_stock"
-// @Router /api/vendors/{vendor_id}/inventory [get]
+// @Router /vendor/{vendor_id}/inventory [get]
 func GetVendorInventoryHandler(c *gin.Context) {
 	vendorID := c.Param("vendor_id")
 	if vendorID == "" {

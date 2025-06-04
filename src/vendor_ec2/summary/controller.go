@@ -13,7 +13,7 @@ import (
 // @Produce json
 // @Param vendor_id query string true "Vendor ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
 // @Success 200 {object} vendors.TodayOrderSummary "Today's order summary retrieved successfully"
-// @Router /api/vendor/order-summary [get]
+// @Router /vendor/orders/summary [get]
 func GetVendorOrderSummary(context *gin.Context) {
 	vendorId := context.Query("vendor_id")
 

@@ -306,10 +306,38 @@ definitions:
     - device_info
     - phone
     type: object
+host: 3.110.123.73
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Qvickly APIs
+  version: "1.0"
 paths:
-  /api/auth/otp/sms:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all available product categories for filtering and organization
+        purposes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Categories retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/vendors.Category'
+            type: array
+      summary: Get All Categories
+      tags:
+      - categories
+  /otp/sms:
     post:
       consumes:
       - application/json
@@ -328,7 +356,7 @@ paths:
       summary: Send OTP via SMS
       tags:
       - authentication
-  /api/auth/otp/whatsapp:
+  /otp/whatsapp:
     post:
       consumes:
       - application/json
@@ -347,178 +375,7 @@ paths:
       summary: Send OTP via WhatsApp
       tags:
       - authentication
-  /api/auth/verify-otp:
-    post:
-      consumes:
-      - application/json
-      description: Verify the OTP code sent via SMS or WhatsApp, create user account
-        if new, and return JWT access token
-      parameters:
-      - description: OTP verification request containing phone number and code
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/verify_otp.Request'
-      produces:
-      - application/json
-      responses: {}
-      summary: Verify OTP and Authenticate User
-      tags:
-      - authentication
-  /api/categories:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all available product categories for filtering and organization
-        purposes
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Categories retrieved successfully
-          schema:
-            items:
-              $ref: '#/definitions/vendors.Category'
-            type: array
-      summary: Get All Categories
-      tags:
-      - categories
-  /api/orders/status:
-    put:
-      consumes:
-      - application/json
-      description: Update the status of an order to track its progress through the
-        fulfillment pipeline. Status changes help coordinate between vendors, delivery
-        partners, and customers.
-      parameters:
-      - description: Order status update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/update_order_status.UpdateOrderStatusRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Order status updated successfully
-          schema:
-            $ref: '#/definitions/update_order_status.UpdateOrderStatusResponse'
-      summary: Update Order Status
-      tags:
-      - orders
-  /api/vendor/order-detail:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve comprehensive details about a specific order including
-        delivery information, customer details, and all items
-      parameters:
-      - description: Order ID
-        in: query
-        name: order_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Order details retrieved successfully
-          schema:
-            $ref: '#/definitions/vendors.OrderDetailsResponse'
-      summary: Get Vendor Order Details
-      tags:
-      - orders
-  /api/vendor/order-summary:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve order count statistics for the current day, grouped by
-        order status. Provides a quick overview of vendor's daily order performance.
-      parameters:
-      - description: Vendor ID
-        in: query
-        name: vendor_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Today's order summary retrieved successfully
-          schema:
-            $ref: '#/definitions/vendors.TodayOrderSummary'
-      summary: Get Vendor Today's Order Summary
-      tags:
-      - order-analytics
-  /api/vendor/orders:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a paginated list of orders for a specific vendor. Maximum
-        10 orders per page to ensure optimal performance.
-      parameters:
-      - description: Vendor ID
-        in: query
-        name: vendor_id
-        required: true
-        type: string
-      - description: 'Page number (default: 1)'
-        in: query
-        name: page
-        type: integer
-      - description: 'Items per page (default: 10, max: 10)'
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Orders retrieved successfully
-          schema:
-            $ref: '#/definitions/vendors.OrdersListResponse'
-      summary: Get Vendor Orders List
-      tags:
-      - orders
-  /api/vendor/profile:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve complete profile information for a specific vendor including
-        business details, location, and operating hours
-      parameters:
-      - description: Vendor ID
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: Get Vendor Profile Details
-      tags:
-      - vendor-profile
-    post:
-      consumes:
-      - application/json
-      description: Create a new vendor profile with complete business information,
-        location details, and operating hours
-      parameters:
-      - description: Complete vendor profile information
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/vendors.CompleteVendorProfile'
-      produces:
-      - application/json
-      responses: {}
-      summary: Create Vendor Profile
-      tags:
-      - vendor-profile
-  /api/vendors/{vendor_id}/inventory:
+  /vendor/{vendor_id}/inventory:
     get:
       consumes:
       - application/json
@@ -579,7 +436,7 @@ paths:
       summary: Add Item to Vendor Inventory
       tags:
       - inventory
-  /api/vendors/{vendor_id}/inventory/{item_id}:
+  /vendor/{vendor_id}/inventory/{item_id}:
     delete:
       consumes:
       - application/json
@@ -631,7 +488,7 @@ paths:
       summary: Update Inventory Item
       tags:
       - inventory
-  /api/vendors/{vendor_id}/inventory/summary:
+  /vendor/{vendor_id}/inventory/summary:
     get:
       consumes:
       - application/json
@@ -653,4 +510,158 @@ paths:
       summary: Get Vendor Inventory Summary
       tags:
       - inventory
+  /vendor/orders/order_details:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve comprehensive details about a specific order including
+        delivery information, customer details, and all items
+      parameters:
+      - description: Order ID
+        in: query
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order details retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.OrderDetailsResponse'
+      summary: Get Vendor Order Details
+      tags:
+      - orders
+  /vendor/orders/recent_orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of orders for a specific vendor. Maximum
+        10 orders per page to ensure optimal performance.
+      parameters:
+      - description: Vendor ID
+        in: query
+        name: vendor_id
+        required: true
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 10, max: 10)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Orders retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.OrdersListResponse'
+      summary: Get Vendor Orders List
+      tags:
+      - orders
+  /vendor/orders/summary:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve order count statistics for the current day, grouped by
+        order status. Provides a quick overview of vendor's daily order performance.
+      parameters:
+      - description: Vendor ID
+        in: query
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Today's order summary retrieved successfully
+          schema:
+            $ref: '#/definitions/vendors.TodayOrderSummary'
+      summary: Get Vendor Today's Order Summary
+      tags:
+      - order-analytics
+  /vendor/orders/update_order_status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of an order to track its progress through the
+        fulfillment pipeline. Status changes help coordinate between vendors, delivery
+        partners, and customers.
+      parameters:
+      - description: Order status update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/update_order_status.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order status updated successfully
+          schema:
+            $ref: '#/definitions/update_order_status.UpdateOrderStatusResponse'
+      summary: Update Order Status
+      tags:
+      - orders
+  /vendor/profile/details:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve complete profile information for a specific vendor including
+        business details, location, and operating hours
+      parameters:
+      - description: Vendor ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Vendor Profile Details
+      tags:
+      - vendor-profile
+  /vendor/profile/details/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new vendor profile with complete business information,
+        location details, and operating hours
+      parameters:
+      - description: Complete vendor profile information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/vendors.CompleteVendorProfile'
+      produces:
+      - application/json
+      responses: {}
+      summary: Create Vendor Profile
+      tags:
+      - vendor-profile
+  /verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify the OTP code sent via SMS or WhatsApp, create user account
+        if new, and return JWT access token
+      parameters:
+      - description: OTP verification request containing phone number and code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/verify_otp.Request'
+      produces:
+      - application/json
+      responses: {}
+      summary: Verify OTP and Authenticate User
+      tags:
+      - authentication
 swagger: "2.0"

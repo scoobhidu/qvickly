@@ -15,7 +15,7 @@ import (
 // @Produce json
 // @Param vendor_id path string true "Vendor ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
 // @Param request body vendors.AddItemToInventoryRequest true "Add item to inventory request"
-// @Router /api/vendors/{vendor_id}/inventory [post]
+// @Router /vendor/{vendor_id}/inventory [post]
 func AddItemToInventoryHandler(c *gin.Context) {
 	vendorID := c.Param("vendor_id")
 	if vendorID == "" {

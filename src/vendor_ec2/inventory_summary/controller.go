@@ -16,7 +16,7 @@ import (
 // @Produce json
 // @Param vendor_id path string true "Vendor ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
 // @Success 200 {object} vendors.InventorySummary "Inventory summary retrieved successfully"
-// @Router /api/vendors/{vendor_id}/inventory/summary [get]
+// @Router /vendor/{vendor_id}/inventory/summary [get]
 func GetVendorInventorySummaryHandler(c *gin.Context) {
 	vendorID := c.Param("vendor_id")
 	if vendorID == "" {

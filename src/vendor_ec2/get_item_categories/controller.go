@@ -13,7 +13,7 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {object} []vendors.Category "Categories retrieved successfully"
-// @Router /api/categories [get]
+// @Router /categories [get]
 func GetCategoriesHandler(c *gin.Context) {
 	categories, err := postgres.GetItemCategories()
 

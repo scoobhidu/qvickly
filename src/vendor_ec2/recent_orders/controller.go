@@ -17,7 +17,7 @@ import (
 // @Param page query int false "Page number (default: 1)" minimum:"1" default:"1" example:"1"
 // @Param limit query int false "Items per page (default: 10, max: 10)" minimum:"1" maximum:"10" default:"10" example:"5"
 // @Success 200 {object} vendors.OrdersListResponse "Orders retrieved successfully"
-// @Router /api/vendor/orders [get]
+// @Router /vendor/orders/recent_orders [get]
 func GetVendorOrdersHandler(c *gin.Context) {
 	// Get vendor_id from query parameter
 	vendorID := c.Query("vendor_id")
