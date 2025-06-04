@@ -21,7 +21,7 @@ services:
       retries: 3
     networks:
       - qvickly_network
-      - bridge  # Default bridge network for system-wide access
+      - default  # Use default network for system-wide access
 
   redis:
     image: redis:latest
@@ -39,7 +39,7 @@ services:
       retries: 3
     networks:
       - qvickly_network
-      - bridge
+      - default
 
   app:
     build:
@@ -49,11 +49,11 @@ services:
     ports:
       - "8080:8080"  # Direct access to Go app
     environment:
-      - host=postgres
-      - port=5432
-      - user=postgres
-      - password=postgres
-      - dbname=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - GO_ENV=production
@@ -67,7 +67,7 @@ services:
       - ./logs:/app/logs
     networks:
       - qvickly_network
-      - bridge
+      - default
 
   nginx:
     image: nginx:alpine
@@ -79,14 +79,14 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-#      - ./nginx/ssl:/etc/nginx/ssl:ro
-#      - ./nginx/logs:/var/log/nginx
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
     depends_on:
       - app
     restart: unless-stopped
     networks:
       - qvickly_network
-      - bridge
+      - default
 
   backup:
     image: postgres:latest
