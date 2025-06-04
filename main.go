@@ -20,7 +20,7 @@ import (
 // @contact.email	support@swagger.io
 // @license.name	Apache 2.0
 // @license.url	http://www.apache.org/licenses/LICENSE-2.0.html
-// @host 3.110.123.73
+// @host 43.204.116.255
 func main() {
 	//err := godotenv.Load("pg.env")
 	//if err != nil {
