@@ -7,6 +7,7 @@ import (
 	_ "github.com/swaggo/gin-swagger" // gin-swagger middleware
 	"log"
 	"qvickly/database/postgres"
+	_ "qvickly/docs"
 	"qvickly/router"
 )
 
@@ -21,10 +22,10 @@ import (
 // @license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 // @host 3.110.123.73
 func main() {
-	err := godotenv.Load("pg.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	//err := godotenv.Load("pg.env")
+	//if err != nil {
+	//	log.Fatal("Error loading .env file")
+	//}
 
 	err = postgres.InitConn()
 	if err != nil {
