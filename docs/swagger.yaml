@@ -306,7 +306,7 @@ definitions:
     - device_info
     - phone
     type: object
-host: 43.204.116.255
+host: 3.110.183.54
 info:
   contact:
     email: support@swagger.io
