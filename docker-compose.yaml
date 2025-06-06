@@ -49,11 +49,11 @@ services:
     ports:
       - "8080:8080"  # Direct access to Go app
     environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=postgres
+      - host=postgres
+      - port=5432
+      - user=postgres
+      - password=postgres
+      - dbname=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - GO_ENV=production
@@ -122,3 +122,4 @@ networks:
     ipam:
       config:
         - subnet: 172.20.0.0/16
+          
