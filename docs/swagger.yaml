@@ -585,7 +585,7 @@ paths:
       tags:
       - order-analytics
   /vendor/orders/update_order_status:
-    put:
+    post:
       consumes:
       - application/json
       description: Update the status of an order to track its progress through the

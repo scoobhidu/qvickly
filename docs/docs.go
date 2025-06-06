@@ -213,7 +213,7 @@ const docTemplate = `{
             }
         },
         "/vendor/orders/update_order_status": {
-            "put": {
+            "post": {
                 "description": "Update the status of an order to track its progress through the fulfillment pipeline. Status changes help coordinate between vendors, delivery partners, and customers.",
                 "consumes": [
                     "application/json"
