@@ -178,7 +178,7 @@ func UpdateOrderStatus(orderID, newStatus string) error {
 
 	// Update orders table
 	_, err := pgClient.Exec(ctx,
-		`UPDATE orders.orders SET status = $1, updated_at = $2 WHERE id = $3::uuid`,
+		`UPDATE orders.orders SET status = $1, updated_at = $2 WHERE id = $3`,
 		newStatus, updateTime, orderID)
 
 	if err != nil {
@@ -187,7 +187,12 @@ func UpdateOrderStatus(orderID, newStatus string) error {
 
 	// Insert into status logs
 	_, err = pgClient.Exec(ctx,
-		`INSERT INTO orders.order_status_logs (order_id, status, changed_at) VALUES ($1::uuid, $2, $3)`,
+		`INSERT INTO orders.order_status_logs (order_id, status, changed_at) 
+			 VALUES ($1, $2, $3)
+			 ON CONFLICT (order_id) 
+			 DO UPDATE SET 
+				status = EXCLUDED.status,
+				changed_at = EXCLUDED.changed_at;`,
 		orderID, newStatus, updateTime)
 
 	return err
