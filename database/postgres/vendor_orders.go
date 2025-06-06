@@ -11,7 +11,7 @@ import (
 
 func GetVendorTodaysOrderSummary(vendorId string) (orderSummary *vendors.TodayOrderSummary, err error) {
 	orderSummary = new(vendors.TodayOrderSummary)
-	rows, err := pgClient.Query(context.Background(), `select distinct(status), count(*) from postgres.orders.orders where Date(order_time) = CURRENT_DATE and account_id=$1::uuid group by status`, vendorId)
+	rows, err := pgClient.Query(context.Background(), `select distinct(status), count(*) from postgres.orders.orders where Date(created_at) = CURRENT_DATE and account_id=$1 group by status`, vendorId)
 	defer rows.Close()
 	if errors.Is(err, pgx.ErrNoRows) {
 		orderSummary = nil
