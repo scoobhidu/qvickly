@@ -63,7 +63,7 @@ func GetVendorOrderDetails(orderID string) (*vendors.OrderDetailsResponse, error
 	// Main query to get order details with delivery partner and customer info
 	mainQuery := `
 		SELECT 
-			dp.pin as delivery_partner_pin,
+			o.pickup_pin as delivery_partner_pin,
 			dp.name as delivery_partner_name,
 			dp.phone_number as delivery_partner_phone,
 			o.pack_by_time,
@@ -77,7 +77,7 @@ func GetVendorOrderDetails(orderID string) (*vendors.OrderDetailsResponse, error
 		FROM orders.orders o
 		LEFT JOIN delivery_partners.delivery_partners dp ON o.delivery_partner_id = dp.id
 		LEFT JOIN user_profile.addresses a ON o.customer_address_id = a.id
-		WHERE o.id = $1::uuid`
+		WHERE o.id = $1`
 
 	var response vendors.OrderDetailsResponse
 	var deliveryPartnerPin, deliveryPartnerName, deliveryPartnerPhone *string
@@ -116,7 +116,7 @@ func GetVendorOrderDetails(orderID string) (*vendors.OrderDetailsResponse, error
 	statusQuery := `
 		SELECT status 
 		FROM orders.order_status_logs 
-		WHERE order_id = $1::uuid 
+		WHERE order_id = $1
 		ORDER BY changed_at DESC 
 		LIMIT 1`
 
@@ -140,7 +140,7 @@ func GetVendorOrderDetails(orderID string) (*vendors.OrderDetailsResponse, error
 		FROM orders.order_items oi
 		JOIN vendor_items.items i ON oi.item_id = i.id
 		JOIN vendor_items.item_images ii ON oi.item_id = ii.item_id
-		WHERE oi.order_id = $1::uuid`
+		WHERE oi.order_id = $1`
 
 	rows, err := pgClient.Query(ctx, itemsQuery, orderID)
 	if err != nil {

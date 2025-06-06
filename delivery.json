@@ -1,0 +1,66 @@
+///delivery/profile?id={id}
+//{
+//  "image_url": "url",
+//  "rating": 5.0,
+//  "online": true,
+//  // save latitude and logitude, phone number, aadhar card
+//}
+// add table, add delivery_fee | delivery_instructions | pickup_pin column | delivery_verify_image_url to orders table
+// add cancelled constraint in order_status_logs table
+
+///delivery/profile/orders/summary?id={id}
+//{
+//  "completed": ,
+//  "earnings": "__",
+//  "active_orders": ,
+//}
+
+///delivery/orders/recent?id={id}
+//{
+//  "id": <order_id>,
+//  "status": "Delivered at 2:00 pm",
+//  "earnings": "__",
+//  "items": 3,
+//}
+
+///delivery/order/detail
+//{
+//  "id": "",
+//  "status": "",
+//  "accepted_at": ,
+//  "delivered_at": ,
+//  "delivery_fee": ,
+////  "bonus": ,
+//  "earning": ,
+//  "customer_name": ,
+//  "delivery_address": "",
+//  "delivery_latitude": ,
+//  "delivery_longitude": ,
+//  "delivery_instruction": "",
+//  "items_value": ,
+//  "store_name": ,
+//  "items": [
+//    {
+//      "id": ,
+//      "label": ,
+//      "qty": ,
+//      "image_url": ,
+//    },
+//    {
+//      "id": ,
+//      "label": ,
+//      "qty": ,
+//      "image_url": ,
+//    }
+//  ]
+//}
+
+///delivery/verify_pickup?order_id=&delivery_boy_id=
+//{
+//  "pin": ,
+//}
+
+///delivery/verify_delivery?order_id=&delivery_boy_id=
+//{
+//  "delivery_image": "base64_string",
+//}
