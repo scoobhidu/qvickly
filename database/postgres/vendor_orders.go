@@ -214,19 +214,18 @@ func GetVendorOrders(vendorID string, page, limit int) (*vendors.OrdersListRespo
 				order_id, 
 				status,
 				ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY changed_at DESC) as rn
-			FROM order_status_logs
+			FROM orders.order_status_logs
 		)
 		SELECT 
 			o.id::text as order_id,
-			COALESCE(ls.status, o.status) as order_status,
+			o.status as order_status,
 			o.customer_name,
 			o.order_time as order_time_placed,
 			o.total_amount,
 			o.pack_by_time,
 			o.delivered_by_time,
 			o.pack_by_time as pick_by_time
-		FROM orders o
-		LEFT JOIN latest_status ls ON o.id = ls.order_id AND ls.rn = 1
+		FROM orders.orders o
 		WHERE o.account_id = $1::uuid
 		ORDER BY o.order_time DESC
 		LIMIT $2 OFFSET $3`
