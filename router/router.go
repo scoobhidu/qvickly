@@ -5,8 +5,10 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"qvickly/src/delivery_ec2/delivery_profile_details"
+	order_details2 "qvickly/src/delivery_ec2/order_details"
 	"qvickly/src/delivery_ec2/orders_summary"
 	recentorders2 "qvickly/src/delivery_ec2/recent_orders"
+	"qvickly/src/delivery_ec2/update_location"
 	"qvickly/src/vendor_ec2/add_item_to_inventory"
 	"qvickly/src/vendor_ec2/inventory_items"
 	"qvickly/src/vendor_ec2/inventory_summary"
@@ -50,6 +52,8 @@ func Router(app *gin.Engine) {
 		group.GET("/profile/details", delivery_profile_details.GetDeliveryPartnerProfile)
 		group.GET("/profile/orders/summary", orders_summary.GetDeliveryPartnerOrdersSummary)
 		group.GET("/orders/recent", recentorders2.GetDeliveryPartnerRecentOrders)
+		group.GET("/order/detail", order_details2.GetDeliveryOrderDetail)
+		group.POST("/update_location", update_location.UpdateDeliveryPartnerLocation)
 	}
 
 }

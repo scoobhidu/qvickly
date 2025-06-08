@@ -50,6 +50,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/delivery/order/detail": {
+            "get": {
+                "description": "Retrieve comprehensive order details for a delivery partner including items, customer info, and earnings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delivery Partners"
+                ],
+                "summary": "Get detailed order information for delivery partner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "\"1\"",
+                        "description": "Order ID",
+                        "name": "order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "\"de111111-2222-3333-4444-555555555555\"",
+                        "description": "Delivery Partner UUID",
+                        "name": "delivery_partner_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed order information",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.OrderDetailResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid order ID, missing parameters, or invalid UUID format",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Order not assigned to this delivery partner",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found or delivery partner not found",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/delivery/orders/recent": {
             "get": {
                 "description": "Retrieve recent orders assigned to a delivery partner with status and earnings information",
@@ -232,6 +298,136 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/delivery/update_location": {
+            "post": {
+                "description": "Update the current GPS location of a delivery partner and set them online",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delivery Partners"
+                ],
+                "summary": "Update delivery partner location",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "\"de111111-2222-3333-4444-555555555555\"",
+                        "description": "Delivery Partner UUID",
+                        "name": "delivery_partner_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "GPS coordinates",
+                        "name": "location",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/delivery.UpdateLocationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/delivery/verify_pickup": {
+            "post": {
+                "description": "Verify that delivery partner has picked up order from vendor using vendor-provided PIN and update order status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delivery Partners"
+                ],
+                "summary": "Verify order pickup from vendor using PIN",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "\"123\"",
+                        "description": "Order ID",
+                        "name": "order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "\"de111111-2222-3333-4444-555555555555\"",
+                        "description": "Delivery Partner UUID",
+                        "name": "delivery_boy_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Pickup PIN provided by vendor",
+                        "name": "pin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/delivery.VerifyPickupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pickup verified successfully and order status updated",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.VerifyPickupResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters, missing PIN, or wrong PIN",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.PickupErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Order not assigned to this delivery partner or invalid status transition",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.PickupErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.PickupErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Order already picked up or invalid status for pickup",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.PickupErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.PickupErrorResponse"
                         }
                     }
                 }
@@ -803,6 +999,76 @@ const docTemplate = `{
                 }
             }
         },
+        "delivery.OrderDetailResponse": {
+            "type": "object",
+            "properties": {
+                "accepted_at": {
+                    "type": "string"
+                },
+                "bonus": {
+                    "type": "number"
+                },
+                "customer_name": {
+                    "type": "string"
+                },
+                "delivered_at": {
+                    "type": "string"
+                },
+                "delivery_address": {
+                    "type": "string"
+                },
+                "delivery_fee": {
+                    "type": "number"
+                },
+                "delivery_instruction": {
+                    "type": "string"
+                },
+                "delivery_latitude": {
+                    "type": "number"
+                },
+                "delivery_longitude": {
+                    "type": "number"
+                },
+                "earning": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/delivery.OrderItemDetail"
+                    }
+                },
+                "items_value": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "store_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "delivery.OrderItemDetail": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "qty": {
+                    "type": "integer"
+                }
+            }
+        },
         "delivery.OrdersSummaryResponse": {
             "type": "object",
             "properties": {
@@ -814,6 +1080,29 @@ const docTemplate = `{
                 },
                 "earnings": {
                     "type": "number"
+                }
+            }
+        },
+        "delivery.PickupErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "current_status": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },
@@ -833,6 +1122,67 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "delivery.UpdateLocationRequest": {
+            "type": "object",
+            "required": [
+                "lat",
+                "long"
+            ],
+            "properties": {
+                "lat": {
+                    "type": "number",
+                    "example": 28.6139391
+                },
+                "long": {
+                    "type": "number",
+                    "example": 77.2090212
+                }
+            }
+        },
+        "delivery.VerifyPickupRequest": {
+            "type": "object",
+            "required": [
+                "pin"
+            ],
+            "properties": {
+                "pin": {
+                    "type": "integer",
+                    "example": 1234
+                }
+            }
+        },
+        "delivery.VerifyPickupResponse": {
+            "type": "object",
+            "properties": {
+                "customer_name": {
+                    "type": "string"
+                },
+                "delivery_partner": {
+                    "type": "string"
+                },
+                "items_count": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "new_status": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "vendor_name": {
+                    "type": "string"
+                },
+                "verified_at": {
                     "type": "string"
                 }
             }
