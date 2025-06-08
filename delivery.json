@@ -1,27 +1,14 @@
-///delivery/profile?id={id}
-//{
-//  "image_url": "url",
-//  "rating": 5.0,
-//  "online": true,
-//  // save latitude and logitude, phone number, aadhar card
-//}
-// add table, add delivery_fee | delivery_instructions | pickup_pin column | delivery_verify_image_url to orders table
-// add cancelled constraint in order_status_logs table
+/delivery/orders/recent?id={id}
+[
+  {
+  "id": <order_id>,
+  "status": ,
+  "earnings": ,
+  "last_status_updated_time"
+  "items": 3,
+  }
+]
 
-///delivery/profile/orders/summary?id={id}
-//{
-//  "completed": ,
-//  "earnings": "__",
-//  "active_orders": ,
-//}
-
-///delivery/orders/recent?id={id}
-//{
-//  "id": <order_id>,
-//  "status": "Delivered at 2:00 pm",
-//  "earnings": "__",
-//  "items": 3,
-//}
 
 ///delivery/order/detail
 //{

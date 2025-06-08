@@ -4,6 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"qvickly/src/delivery_ec2/delivery_profile_details"
+	"qvickly/src/delivery_ec2/orders_summary"
+	recentorders2 "qvickly/src/delivery_ec2/recent_orders"
 	"qvickly/src/vendor_ec2/add_item_to_inventory"
 	"qvickly/src/vendor_ec2/inventory_items"
 	"qvickly/src/vendor_ec2/inventory_summary"
@@ -23,8 +26,8 @@ func Router(app *gin.Engine) {
 	{
 		group := app.Group("/vendor")
 
-		group.GET("/profile/details", profile_details.GetVendorProfileDetails)
-		group.POST("/profile/details/create", profile_details.CreateVendorProfileDetails)
+		group.GET("/profile/details", vendor_profile_details.GetVendorProfileDetails)
+		group.POST("/profile/details/create", vendor_profile_details.CreateVendorProfileDetails)
 
 		group.GET("/orders/summary", vendororders.GetVendorOrderSummary)
 		group.GET("/orders/order_details", order_details.GetVendorOrderDetail)
@@ -40,9 +43,13 @@ func Router(app *gin.Engine) {
 		group.DELETE("/:vendor_id/inventory/:item_id", remove_item_from_inventory.RemoveItemFromInventoryHandler)
 		//group.POST("/:vendor_id/inventory/movement", BulkInventoryMovementHandler)
 	}
-	// items group
-	//	router.GET("/categories", GetCategoriesHandler)
-	//
-	//	// Public endpoint for user app
-	//	router.GET("/api/items/available", GetAvailableItemsForUsersHandler)
+
+	{
+		group := app.Group("/delivery")
+
+		group.GET("/profile/details", delivery_profile_details.GetDeliveryPartnerProfile)
+		group.GET("/profile/orders/summary", orders_summary.GetDeliveryPartnerOrdersSummary)
+		group.GET("/orders/recent", recentorders2.GetDeliveryPartnerRecentOrders)
+	}
+
 }

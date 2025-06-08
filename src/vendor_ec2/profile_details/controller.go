@@ -1,4 +1,4 @@
-package profile_details
+package vendor_profile_details
 
 import (
 	"github.com/gin-gonic/gin"

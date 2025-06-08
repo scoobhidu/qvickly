@@ -50,6 +50,193 @@ const docTemplate = `{
                 }
             }
         },
+        "/delivery/orders/recent": {
+            "get": {
+                "description": "Retrieve recent orders assigned to a delivery partner with status and earnings information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delivery Partners"
+                ],
+                "summary": "Get recent orders for delivery partner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "\"de111111-2222-3333-4444-555555555555\"",
+                        "description": "Delivery Partner UUID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "Number of recent orders to fetch (default: 20, max: 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"completed\"",
+                        "description": "Filter by order status (pending, accepted, packed, ready, completed, cancelled, rejected)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Include detailed order information",
+                        "name": "detailed",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of recent orders",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/delivery.RecentOrderResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format, missing ID parameter, or invalid limit",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery partner not found",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/delivery/profile/details": {
+            "get": {
+                "description": "Retrieve detailed profile information for a delivery partner by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delivery Partners"
+                ],
+                "summary": "Get delivery partner profile details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "\"de111111-2222-3333-4444-555555555555\"",
+                        "description": "Delivery Partner UUID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delivery partner profile details",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.DeliveryProfileDetailsSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format or missing ID parameter",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery partner not found",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/delivery/profile/orders/summary": {
+            "get": {
+                "description": "Retrieve orders summary including completed orders, earnings, and active orders for a delivery partner",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delivery Partners"
+                ],
+                "summary": "Get delivery partner orders summary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "\"de111111-2222-3333-4444-555555555555\"",
+                        "description": "Delivery Partner UUID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Include detailed order lists",
+                        "name": "detailed",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Basic orders summary",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.OrdersSummaryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format or missing ID parameter",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery partner not found",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/otp/sms": {
             "post": {
                 "description": "Send a one-time password (OTP) to the provided phone number via SMS using Twilio Verify service",
@@ -517,6 +704,139 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "delivery.DeliveryPartnerProfile": {
+            "type": "object",
+            "properties": {
+                "aadhar_card_image_url": {
+                    "type": "string"
+                },
+                "aadhar_card_number": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date_of_birth": {
+                    "type": "string"
+                },
+                "driving_license_number": {
+                    "type": "string"
+                },
+                "emergency_contact_name": {
+                    "type": "string"
+                },
+                "emergency_contact_phone": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "last_location_update": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "online": {
+                    "type": "boolean"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "total_deliveries": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "upi_id": {
+                    "type": "string"
+                },
+                "vehicle_number": {
+                    "type": "string"
+                },
+                "vehicle_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "delivery.DeliveryProfileDetailsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/delivery.DeliveryPartnerProfile"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "delivery.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "delivery.OrdersSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "active_orders": {
+                    "type": "integer"
+                },
+                "completed": {
+                    "type": "integer"
+                },
+                "earnings": {
+                    "type": "number"
+                }
+            }
+        },
+        "delivery.RecentOrderResponse": {
+            "type": "object",
+            "properties": {
+                "earnings": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "integer"
+                },
+                "last_status_updated_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "send_otp.Request": {
             "type": "object",
             "required": [
