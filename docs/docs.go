@@ -644,7 +644,7 @@ const docTemplate = `{
                 "summary": "Get Vendor Profile Details",
                 "parameters": [
                     {
-                        "description": "Complete vendor profile informatio",
+                        "description": "Complete vendor profile information",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -1332,7 +1332,7 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string",
-                    "example": "90e88b7f157a30"
+                    "example": "c4a538ea019b7a"
                 },
                 "phone": {
                     "type": "string",

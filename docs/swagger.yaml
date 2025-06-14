@@ -291,7 +291,7 @@ definitions:
   vendors.GetVendorProfileRequestBody:
     properties:
       password:
-        example: 90e88b7f157a30
+        example: c4a538ea019b7a
         type: string
       phone:
         example: "9876543211"
@@ -1081,7 +1081,7 @@ paths:
       description: Retrieve complete profile information for a specific vendor including
         business details, location, and operating hours
       parameters:
-      - description: Complete vendor profile informatio
+      - description: Complete vendor profile information
         in: body
         name: request
         required: true

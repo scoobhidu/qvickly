@@ -13,7 +13,7 @@ import (
 // @Tags vendor-profile
 // @Accept json
 // @Produce json
-// @Param request body vendors.GetVendorProfileRequestBody true "Complete vendor profile informatio"
+// @Param request body vendors.GetVendorProfileRequestBody true "Complete vendor profile information"
 // @Router /vendor/profile/details [post]
 func GetVendorProfileDetails(context *gin.Context) {
 	var json vendors.GetVendorProfileRequestBody

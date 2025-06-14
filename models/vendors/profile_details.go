@@ -14,7 +14,7 @@ type VendorProfileDetails struct {
 // CompleteVendorProfile represents comprehensive vendor profile information
 type GetVendorProfileRequestBody struct {
 	Phone    string `json:"phone" db:"phone" example:"9876543211" description:"Primary contact phone number for the vendor"`
-	Password string `json:"password" db:"password" example:"90e88b7f157a30" description:"Password for the vendor"`
+	Password string `json:"password" db:"password" example:"c4a538ea019b7a" description:"Password for the vendor"`
 }
 
 // CompleteVendorProfile represents comprehensive vendor profile information

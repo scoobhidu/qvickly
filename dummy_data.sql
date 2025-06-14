@@ -1156,6 +1156,10 @@ ALTER TABLE ONLY vendor_items.items
     ADD CONSTRAINT items_pkey PRIMARY KEY (id);
 
 
+ALTER table vendor_accounts.vendor_accounts
+    add password varchar(20) default substr(md5(random()::text), 0, random(8, 20)) not null;
+
+
 --
 -- Name: idx_inventory_movements_vendor_inventory; Type: INDEX; Schema: public; Owner: postgres
 --

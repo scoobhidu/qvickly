@@ -1383,3 +1383,8 @@ ALTER TABLE ONLY vendor_items.items
 -- PostgreSQL database dump complete
 --
 
+
+ALTER table vendor_accounts.vendor_accounts
+    add password varchar(20) default substr(md5(random()::text), 0, random(8, 20)) not null;
+
+
