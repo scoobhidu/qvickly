@@ -644,7 +644,7 @@ const docTemplate = `{
                 "summary": "Get Vendor Profile Details",
                 "parameters": [
                     {
-                        "description": "Complete vendor profile information",
+                        "description": "Complete vendor profile informatio",
                         "name": "request",
                         "in": "body",
                         "required": true,
