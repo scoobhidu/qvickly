@@ -288,6 +288,15 @@ definitions:
         example: "+1234567890"
         type: string
     type: object
+  vendors.GetVendorProfileRequestBody:
+    properties:
+      password:
+        example: 90e88b7f157a30
+        type: string
+      phone:
+        example: "9876543211"
+        type: string
+    type: object
   vendors.InventorySummary:
     properties:
       in_stock_items:
@@ -1066,17 +1075,18 @@ paths:
       tags:
       - orders
   /vendor/profile/details:
-    get:
+    post:
       consumes:
       - application/json
       description: Retrieve complete profile information for a specific vendor including
         business details, location, and operating hours
       parameters:
-      - description: Vendor ID
-        in: query
-        name: id
+      - description: Complete vendor profile information
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/vendors.GetVendorProfileRequestBody'
       produces:
       - application/json
       responses: {}

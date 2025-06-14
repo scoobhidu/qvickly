@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data_new
+      - ./dump.sql:/docker-entrypoint-initdb.d/dummy_data.sql
+    ports:
+      - "5432:5432"  # Expose to internet and other containers
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - default  # Use default network for system-wide access
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"  # Expose to internet and other containers
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - default
+
+  backup:
+    image: postgres:latest
+    depends_on:
+      - postgres
+    volumes:
+      - postgres_data:/src/data
+      - postgres_backup:/backup
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    command: |
+      bash -c 'while true; do
+        pg_dump -h postgres -U postgres postgres > /backup/backup_$$(date +%Y%m%d_%H%M%S).sql;
+        sleep 86400;
+      done'
+
+volumes:
+  postgres_data:
+  postgres_backup:
+  redis_data:

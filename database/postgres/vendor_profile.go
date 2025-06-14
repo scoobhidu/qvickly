@@ -5,9 +5,9 @@ import (
 	"qvickly/models/vendors"
 )
 
-func GetVendorProfile(vendorId string) (vendorDetails *vendors.VendorProfileDetails, err error) {
+func GetVendorProfile(phoneNumber, password string) (vendorDetails *vendors.VendorProfileDetails, err error) {
 	vendorDetails = new(vendors.VendorProfileDetails)
-	err = pgClient.QueryRow(context.Background(), `SELECT image_url, business_name, owner_name, live_status FROM postgres.vendor_accounts.vendor_accounts where id=$1::uuid`, vendorId).Scan(&vendorDetails.ImageS3URL, &vendorDetails.StoreName, &vendorDetails.OwnerName, &vendorDetails.StoreLiveStatus)
+	err = pgClient.QueryRow(context.Background(), `SELECT id, image_url, business_name, owner_name, live_status FROM postgres.vendor_accounts.vendor_accounts where phone_number=$1 and password=$2`, phoneNumber, password).Scan(&vendorDetails.VendorId, &vendorDetails.ImageS3URL, &vendorDetails.StoreName, &vendorDetails.OwnerName, &vendorDetails.StoreLiveStatus)
 	if err != nil {
 		vendorDetails = nil
 	}

@@ -4,10 +4,17 @@ import "time"
 
 // VendorProfileDetails represents basic vendor profile information for quick display
 type VendorProfileDetails struct {
+	VendorId        string `json:"vendor_id" db:"vendor_id" example:"88888888-9999-aaaa-bbbb-cccccccccccc"`
 	ImageS3URL      string `json:"image_s3_url" db:"image_url" example:"https://my-bucket.s3.amazonaws.com/vendors/store-123.jpg" description:"S3 URL for the vendor's store image/logo"`
 	OwnerName       string `json:"owner_name" db:"owner_name" example:"John Smith" description:"Full name of the store owner"`
 	StoreName       string `json:"store_name" db:"business_name" example:"Smith's Fresh Market" description:"Display name of the store/business"`
 	StoreLiveStatus bool   `json:"live_status" db:"live_status" example:"true" description:"Whether the store is currently open and accepting orders"`
+}
+
+// CompleteVendorProfile represents comprehensive vendor profile information
+type GetVendorProfileRequestBody struct {
+	Phone    string `json:"phone" db:"phone" example:"9876543211" description:"Primary contact phone number for the vendor"`
+	Password string `json:"password" db:"password" example:"90e88b7f157a30" description:"Password for the vendor"`
 }
 
 // CompleteVendorProfile represents comprehensive vendor profile information

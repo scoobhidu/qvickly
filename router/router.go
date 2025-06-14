@@ -28,7 +28,7 @@ func Router(app *gin.Engine) {
 	{
 		group := app.Group("/vendor")
 
-		group.GET("/profile/details", vendor_profile_details.GetVendorProfileDetails)
+		group.POST("/profile/details", vendor_profile_details.GetVendorProfileDetails)
 		group.POST("/profile/details/create", vendor_profile_details.CreateVendorProfileDetails)
 
 		group.GET("/orders/summary", vendororders.GetVendorOrderSummary)

@@ -13,13 +13,17 @@ import (
 // @Tags vendor-profile
 // @Accept json
 // @Produce json
-// @Param id query string true "Vendor ID" format:"uuid" example:"123e4567-e89b-12d3-a456-426614174000"
-// @Router /vendor/profile/details [get]
+// @Param request body vendors.GetVendorProfileRequestBody true "Complete vendor profile information"
+// @Router /vendor/profile/details [post]
 func GetVendorProfileDetails(context *gin.Context) {
-	vendorID := context.Query("id")
-	vendorDetails, err := postgres.GetVendorProfile(vendorID)
+	var json vendors.GetVendorProfileRequestBody
+	if err := context.ShouldBindJSON(&json); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	vendorDetails, err := postgres.GetVendorProfile(json.Phone, json.Password)
 	if err != nil {
-		context.JSON(500, gin.H{"error": "Failed to get vendor profile"})
+		context.JSON(500, gin.H{"error": "Failed to get vendor profile" + err.Error()})
 		return
 	} else {
 		context.JSON(200, gin.H{"vendor_details": vendorDetails})

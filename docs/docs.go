@@ -630,7 +630,7 @@ const docTemplate = `{
             }
         },
         "/vendor/profile/details": {
-            "get": {
+            "post": {
                 "description": "Retrieve complete profile information for a specific vendor including business details, location, and operating hours",
                 "consumes": [
                     "application/json"
@@ -644,11 +644,13 @@ const docTemplate = `{
                 "summary": "Get Vendor Profile Details",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Vendor ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
+                        "description": "Complete vendor profile information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/vendors.GetVendorProfileRequestBody"
+                        }
                     }
                 ],
                 "responses": {}
@@ -1322,6 +1324,19 @@ const docTemplate = `{
                 "phone": {
                     "type": "string",
                     "example": "+1234567890"
+                }
+            }
+        },
+        "vendors.GetVendorProfileRequestBody": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "90e88b7f157a30"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "9876543211"
                 }
             }
         },
