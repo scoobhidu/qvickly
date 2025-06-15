@@ -123,7 +123,7 @@ func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 	err = pgClient.QueryRow(ctx, statusQuery, orderID).Scan(&response.OrderStatus)
 	if err != nil {
 		// If no status logs exist, use order.status as fallback
-		fallbackQuery := `SELECT status FROM orders.orders WHERE id = $1::uuid`
+		fallbackQuery := `SELECT status FROM orders.orders WHERE id = $1`
 		err = pgClient.QueryRow(ctx, fallbackQuery, orderID).Scan(&response.OrderStatus)
 		if err != nil {
 			return nil, err
