@@ -25,9 +25,8 @@ type InventorySummary struct {
 
 // AddItemToInventoryRequest for adding new items to vendor inventory
 type AddItemToInventoryRequest struct {
-	ItemID        int      `json:"item_id" binding:"required" example:"456" description:"ID of the item from master catalog to add to inventory"`
-	StockQuantity int      `json:"stock_quantity" binding:"required" example:"50" minimum:"0" description:"Initial stock quantity to add"`
-	PriceOverride *float64 `json:"price_override" example:"11.99" minimum:"0" description:"Optional vendor-specific price (null to use default price)"`
+	ItemID        int `json:"item_id" binding:"required" example:"456" description:"ID of the item from master catalog to add to inventory"`
+	StockQuantity int `json:"stock_quantity" binding:"required" example:"50" minimum:"0" description:"Initial stock quantity to add"`
 }
 
 // UpdateInventoryRequest for updating existing inventory items

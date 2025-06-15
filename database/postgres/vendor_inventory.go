@@ -122,11 +122,11 @@ func AddItemsToInventory(vendorID string, req vendors.AddItemToInventoryRequest)
 	// Insert into vendor_inventory
 	var inventoryID string
 	insertQuery := `
-		INSERT INTO vendor_inventory (vendor_id, item_id, stock_quantity, price_override, is_available, created_at, updated_at)
-		VALUES ($1::uuid, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		INSERT INTO vendor_inventory (vendor_id, item_id, stock_quantity, is_available, created_at, updated_at)
+		VALUES ($1::uuid, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id`
 
-	err = tx.QueryRow(ctx, insertQuery, vendorID, req.ItemID, req.StockQuantity, req.PriceOverride, true).Scan(&inventoryID)
+	err = tx.QueryRow(ctx, insertQuery, vendorID, req.ItemID, req.StockQuantity, true).Scan(&inventoryID)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to add item"})
 		return

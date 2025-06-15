@@ -1390,7 +1390,10 @@ create table vendor_items.super_categories
 (
     category_name  varchar not null,
     sub_categories text references vendor_items.categories(name)
-)
+);
+
+alter table orders.orders
+    add pickup_pin integer default random(1000, 9999) not null;
 
 --
 -- PostgreSQL database dump complete
@@ -1634,13 +1637,6 @@ INSERT INTO orders.order_status_logs (id, order_id, status, changed_at) VALUES
                                                                             (19, 8, 'pending', '2024-05-28 14:20:00'),
                                                                             (20, 8, 'accepted', '2024-05-28 14:35:00');
 
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Snacks');
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Munchies');
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Cold drinks');
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Juice');
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Tea');
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Coffee');
-INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Health Drinks');
 INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Snacks');
 INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Munchies');
 INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Cold drinks');

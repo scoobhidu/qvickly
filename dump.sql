@@ -1395,4 +1395,7 @@ create table vendor_items.super_categories
 (
     category_name  varchar not null,
     sub_categories text references vendor_items.categories(name)
-)
+);
+
+alter table orders.orders
+    add pickup_pin integer default random(1000, 9999) not null;
