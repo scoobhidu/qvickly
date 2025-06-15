@@ -12,8 +12,7 @@ import (
 // @Tags categories
 // @Accept json
 // @Produce json
-// @Success 200 {object} []vendors.Category "Categories retrieved successfully"
-// @Router /categories [get]
+// @Router /vendor/categories [get]
 func GetCategoriesHandler(c *gin.Context) {
 	categories, err := postgres.GetItemCategories()
 
@@ -21,5 +20,17 @@ func GetCategoriesHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to fetch categories"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": categories})
+
+	m := make(map[string][]interface{})
+
+	for _, v := range categories {
+		l := make([]interface{}, 0)
+
+		l = append(l, v.Name)
+		l = append(l, v.ID)
+
+		m[v.SuperCategory] = append(m[v.SuperCategory], l)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": m})
 }

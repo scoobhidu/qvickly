@@ -1383,6 +1383,15 @@ ALTER TABLE ONLY vendor_items.items
     ADD CONSTRAINT items_vendor_id_fkey FOREIGN KEY (vendor_id) REFERENCES vendor_accounts.vendor_accounts(id);
 
 
+alter table vendor_items.items
+    drop column vendor_id;
+
+create table vendor_items.super_categories
+(
+    category_name  varchar not null,
+    sub_categories text references vendor_items.categories(name)
+)
+
 --
 -- PostgreSQL database dump complete
 --
@@ -1498,18 +1507,84 @@ INSERT INTO vendor_items.categories (id, name, created_at) VALUES
                                                                (6, 'Pizza', '2024-01-01 00:00:00'),
                                                                (7, 'Groceries', '2024-01-01 00:00:00');
 
--- Insert Vendor Items
-INSERT INTO vendor_items.items (id, account_id, category_id, name, description, price_retail, price_wholesale, is_available, stock, created_at, updated_at, search_keywords, is_active, vendor_id) VALUES
-                                                                                                                                                                                                       (1, '69fc8ba4-d11f-4618-9042-c1523d381013', 1, 'Chicken Tikka', 'Grilled chicken marinated in spices', 180.00, 150.00, true, 50, '2024-01-10 08:00:00', '2024-01-10 08:00:00', 'chicken tikka starter grilled', true, '69fc8ba4-d11f-4618-9042-c1523d381013'),
-                                                                                                                                                                                                       (2, '69fc8ba4-d11f-4618-9042-c1523d381013', 2, 'Butter Chicken', 'Creamy tomato-based chicken curry', 320.00, 280.00, true, 30, '2024-01-10 08:00:00', '2024-01-10 08:00:00', 'butter chicken curry main course', true, '69fc8ba4-d11f-4618-9042-c1523d381013'),
-                                                                                                                                                                                                       (3, '69fc8ba4-d11f-4618-9042-c1523d381013', 5, 'Chicken Biryani', 'Aromatic basmati rice with spiced chicken', 280.00, 240.00, true, 25, '2024-01-10 08:00:00', '2024-01-10 08:00:00', 'chicken biryani rice basmati', true, '69fc8ba4-d11f-4618-9042-c1523d381013'),
-                                                                                                                                                                                                       (4, '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 1, 'Paneer Tikka', 'Grilled cottage cheese with vegetables', 160.00, 130.00, true, 40, '2024-01-15 10:00:00', '2024-01-15 10:00:00', 'paneer tikka vegetarian starter', true, '77777777-8888-9999-aaaa-bbbbbbbbbbbb'),
-                                                                                                                                                                                                       (5, '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 2, 'Dal Makhani', 'Rich black lentil curry', 220.00, 180.00, true, 35, '2024-01-15 10:00:00', '2024-01-15 10:00:00', 'dal makhani lentil curry', true, '77777777-8888-9999-aaaa-bbbbbbbbbbbb'),
-                                                                                                                                                                                                       (6, '99999999-aaaa-bbbb-cccc-dddddddddddd', 6, 'Margherita Pizza', 'Classic pizza with tomato and mozzarella', 250.00, 200.00, true, 20, '2024-02-10 11:00:00', '2024-02-10 11:00:00', 'margherita pizza cheese tomato', true, '99999999-aaaa-bbbb-cccc-dddddddddddd'),
-                                                                                                                                                                                                       (7, '99999999-aaaa-bbbb-cccc-dddddddddddd', 6, 'Pepperoni Pizza', 'Pizza topped with pepperoni and cheese', 350.00, 300.00, true, 15, '2024-02-10 11:00:00', '2024-02-10 11:00:00', 'pepperoni pizza meat cheese', true, '99999999-aaaa-bbbb-cccc-dddddddddddd'),
-                                                                                                                                                                                                       (8, '88888888-9999-aaaa-bbbb-cccccccccccc', 7, 'Organic Tomatoes (1kg)', 'Fresh organic tomatoes', 60.00, 45.00, true, 100, '2024-02-01 07:30:00', '2024-02-01 07:30:00', 'organic tomatoes vegetables fresh', true, '88888888-9999-aaaa-bbbb-cccccccccccc'),
-                                                                                                                                                                                                       (9, '88888888-9999-aaaa-bbbb-cccccccccccc', 7, 'Basmati Rice (5kg)', 'Premium quality basmati rice', 450.00, 400.00, true, 50, '2024-02-01 07:30:00', '2024-02-01 07:30:00', 'basmati rice premium grain', true, '88888888-9999-aaaa-bbbb-cccccccccccc'),
-                                                                                                                                                                                                       (10, 'aaaabbbb-cccc-dddd-eeee-ffffffffffff', 7, 'Organic Spinach (500g)', 'Fresh organic spinach leaves', 35.00, 28.00, true, 75, '2024-02-20 06:00:00', '2024-02-20 06:00:00', 'organic spinach green leafy vegetables', true, 'aaaabbbb-cccc-dddd-eeee-ffffffffffff');
+
+UPDATE vendor_items.categories SET name = 'Juice' WHERE id = 4;
+UPDATE vendor_items.categories SET name = 'Tea' WHERE id = 5;
+UPDATE vendor_items.categories SET name = 'Health Drink' WHERE id = 7;
+UPDATE vendor_items.categories SET name = 'Munchies' WHERE id = 2;
+UPDATE vendor_items.categories SET name = 'Snacks' WHERE id = 1;
+UPDATE vendor_items.categories SET name = 'Cold drinks' WHERE id = 3;
+UPDATE vendor_items.categories SET name = 'Coffee' WHERE id = 6;
+
+
+INSERT INTO vendor_items.items (
+    account_id, category_id, name, description,
+    price_retail, price_wholesale, is_available, stock,
+    search_keywords, is_active
+) VALUES
+      -- Snacks (category_id = 1)
+      ('69fc8ba4-d11f-4618-9042-c1523d381013', 1, 'Lay''s Classic Salted Chips', 'Crispy potato chips with perfect salt seasoning', 20.00, 18.00, true, 150, 'lays chips potato crispy snack salt', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 1, 'Kurkure Masala Munch', 'Crunchy corn puffs with spicy masala flavor', 15.00, 13.50, true, 200, 'kurkure corn masala spicy crunchy snack', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 1, 'Haldiram''s Bhujia', 'Traditional spicy gram flour snack', 25.00, 22.00, true, 80, 'haldiram bhujia gram flour spicy traditional', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 1, 'Britannia Good Day Cookies', 'Butter cookies with cashew and almond', 30.00, 27.00, true, 120, 'britannia cookies butter cashew almond sweet', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 1, 'Parle-G Biscuits', 'Classic glucose biscuits perfect with tea', 10.00, 9.00, true, 300, 'parle glucose biscuit tea classic indian', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 1, 'Bikano Moong Dal', 'Roasted moong dal with spices', 35.00, 32.00, true, 90, 'bikano moong dal roasted spices healthy', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 1, 'Uncle Chips Spice It Up', 'Potato chips with tangy spice mix', 20.00, 18.00, true, 110, 'uncle chips potato tangy spice mix', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 1, 'Balaji Wafers Masala', 'Crispy potato wafers with masala seasoning', 15.00, 13.00, true, 180, 'balaji wafers potato masala crispy', true),
+
+      -- Munchies (category_id = 2)
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 2, 'Roasted Peanuts', 'Fresh roasted peanuts with salt', 40.00, 35.00, true, 50, 'peanuts roasted salt healthy protein nuts', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 2, 'Mixed Dry Fruits', 'Premium mix of almonds, cashews, and raisins', 120.00, 110.00, true, 30, 'dry fruits almonds cashews raisins premium healthy', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 2, 'Chana Jor Garam', 'Spicy flattened chickpeas snack', 25.00, 22.00, true, 75, 'chana chickpeas spicy flattened street food', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 2, 'Banana Chips', 'Crispy fried banana chips', 30.00, 27.00, true, 60, 'banana chips fried crispy south indian snack', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 2, 'Murukku Spiral', 'Traditional South Indian rice crackers', 35.00, 32.00, true, 45, 'murukku spiral rice crackers south indian traditional', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 2, 'Khakhra Methi', 'Gujarati thin crispy bread with fenugreek', 25.00, 22.00, true, 80, 'khakhra methi gujarati crispy bread fenugreek', true),
+
+      -- Cold Drinks (category_id = 3)
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 3, 'Coca Cola 600ml', 'Classic cola soft drink', 40.00, 35.00, true, 200, 'coca cola coke soft drink carbonated', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 3, 'Pepsi 600ml', 'Refreshing cola beverage', 40.00, 35.00, true, 180, 'pepsi cola soft drink carbonated refreshing', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 3, 'Sprite 600ml', 'Lemon-lime clear soda', 40.00, 35.00, true, 150, 'sprite lemon lime clear soda carbonated', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 3, 'Fanta Orange 600ml', 'Orange flavored carbonated drink', 40.00, 35.00, true, 120, 'fanta orange carbonated drink fruity', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 3, 'Thums Up 600ml', 'Strong taste cola drink', 40.00, 35.00, true, 140, 'thumbs up cola strong taste carbonated', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 3, 'Limca 600ml', 'Lemon flavored sparkling drink', 40.00, 35.00, true, 110, 'limca lemon sparkling drink carbonated', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 3, 'Mountain Dew 600ml', 'Citrus flavored energy drink', 40.00, 35.00, true, 100, 'mountain dew citrus energy drink carbonated', true),
+
+      -- Juice (category_id = 4)
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 4, 'Real Mango Juice 1L', 'Pure mango juice with pulp', 85.00, 80.00, true, 60, 'real mango juice pulp natural fruit', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 4, 'Tropicana Orange Juice 1L', 'Fresh orange juice 100% natural', 95.00, 90.00, true, 45, 'tropicana orange juice natural fresh 100%', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 4, 'Paper Boat Aam Panna', 'Traditional raw mango drink', 30.00, 27.00, true, 80, 'paper boat aam panna mango traditional drink', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 4, 'Minute Maid Apple Juice', 'Crisp apple juice drink', 25.00, 22.00, true, 90, 'minute maid apple juice crisp fruit drink', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 4, 'Fresh Lime Water', 'Freshly squeezed lime with water', 15.00, 12.00, true, 120, 'lime water fresh squeezed natural healthy', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 4, 'Cranberry Juice 500ml', 'Pure cranberry juice concentrate', 75.00, 70.00, true, 25, 'cranberry juice pure concentrate healthy antioxidant', true),
+
+      -- Tea (category_id = 5)
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 5, 'Tata Tea Gold 500g', 'Premium black tea blend', 220.00, 200.00, true, 40, 'tata tea gold premium black blend quality', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 5, 'Red Label Tea 500g', 'Strong CTC tea powder', 180.00, 165.00, true, 50, 'red label tea ctc strong powder traditional', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 5, 'Lipton Green Tea Bags', 'Healthy green tea in convenient bags', 150.00, 140.00, true, 30, 'lipton green tea bags healthy antioxidant', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 5, 'Taj Mahal Tea 500g', 'Rich and aromatic tea blend', 200.00, 185.00, true, 35, 'taj mahal tea rich aromatic blend premium', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 5, 'Brooke Bond Taaza', 'Fresh and strong tea leaves', 160.00, 150.00, true, 55, 'brooke bond taaza fresh strong leaves', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 5, 'Organic Tulsi Tea', 'Herbal tulsi tea for wellness', 120.00, 110.00, true, 25, 'tulsi tea herbal organic wellness ayurvedic', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 5, 'Darjeeling Tea 250g', 'Premium Darjeeling black tea', 300.00, 280.00, true, 20, 'darjeeling tea premium black mountain quality', true),
+
+      -- Coffee (category_id = 6)
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 6, 'Nescafe Classic Instant Coffee', 'Rich and aromatic instant coffee', 180.00, 165.00, true, 60, 'nescafe classic instant coffee rich aromatic', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 6, 'Bru Instant Coffee 200g', 'Perfect blend of coffee and chicory', 220.00, 200.00, true, 45, 'bru instant coffee chicory blend perfect', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 6, 'Tata Coffee Grand', 'Premium filter coffee powder', 280.00, 260.00, true, 30, 'tata coffee grand premium filter powder south indian', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 6, 'Blue Tokai Coffee Beans', 'Freshly roasted Arabica coffee beans', 450.00, 420.00, true, 15, 'blue tokai coffee beans arabica roasted fresh specialty', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 6, 'Continental Coffee Xtra', 'Strong and bold coffee blend', 160.00, 145.00, true, 50, 'continental coffee xtra strong bold blend', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 6, 'Cold Coffee Mix', 'Ready to make cold coffee powder', 120.00, 110.00, true, 40, 'cold coffee mix ready powder instant summer', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 6, 'French Press Coffee', 'Coarse ground coffee for French press', 350.00, 320.00, true, 20, 'french press coffee coarse ground specialty brewing', true),
+
+      -- Health Drink (category_id = 7)
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 7, 'Horlicks Original 500g', 'Nutritious malted health drink', 250.00, 230.00, true, 35, 'horlicks original malted health nutrition kids', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 7, 'Complan Chocolate Flavor', 'Complete nutrition drink for growing kids', 280.00, 260.00, true, 40, 'complan chocolate nutrition kids growth complete', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 7, 'Bournvita 5 Star Magic', 'Chocolate health drink with vitamins', 220.00, 200.00, true, 50, 'bournvita chocolate health vitamins energy kids', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 7, 'Protinex Original', 'High protein nutritional supplement', 450.00, 420.00, true, 25, 'protinex protein supplement nutrition health powder', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 7, 'Ensure Vanilla Flavor', 'Complete balanced nutrition for adults', 650.00, 600.00, true, 15, 'ensure vanilla nutrition adults balanced complete health', true),
+      ( '88888888-9999-aaaa-bbbb-cccccccccccc', 7, 'Amul Pro Whey Protein', 'Pure whey protein powder', 850.00, 800.00, true, 10, 'amul whey protein pure powder fitness muscle', true),
+      ( '69fc8ba4-d11f-4618-9042-c1523d381013', 7, 'Tang Orange Flavor', 'Vitamin C enriched instant drink mix', 80.00, 72.00, true, 80, 'tang orange vitamin c instant drink mix kids', true),
+      ( '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 7, 'Rasna Concentrate', 'Fruit drink concentrate for family', 45.00, 40.00, true, 100, 'rasna concentrate fruit drink family summer', true);
+
 
 -- Insert Item Images
 INSERT INTO vendor_items.item_images (id, item_id, image_url, "position", created_at) VALUES
@@ -1525,30 +1600,6 @@ INSERT INTO vendor_items.item_images (id, item_id, image_url, "position", create
                                                                                           (10, 9, 'https://example.com/items/basmati-rice-1.jpg', 1, '2024-02-01 07:30:00'),
                                                                                           (11, 10, 'https://example.com/items/organic-spinach-1.jpg', 1, '2024-02-20 06:00:00');
 
--- Insert Vendor Inventory
-INSERT INTO public.vendor_inventory (id, vendor_id, item_id, stock_quantity, is_available, price_override, created_at, updated_at) VALUES
-                                                                                                                                       ('aa111111-2222-3333-4444-555555555555', '69fc8ba4-d11f-4618-9042-c1523d381013', 1, 50, true, NULL, '2024-01-10 08:00:00', '2024-01-10 08:00:00'),
-                                                                                                                                       ('bb222222-3333-4444-5555-666666666666', '69fc8ba4-d11f-4618-9042-c1523d381013', 2, 30, true, NULL, '2024-01-10 08:00:00', '2024-01-10 08:00:00'),
-                                                                                                                                       ('cc333333-4444-5555-6666-777777777777', '69fc8ba4-d11f-4618-9042-c1523d381013', 3, 25, true, NULL, '2024-01-10 08:00:00', '2024-01-10 08:00:00'),
-                                                                                                                                       ('dd444444-5555-6666-7777-888888888888', '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 4, 40, true, 150.00, '2024-01-15 10:00:00', '2024-01-15 10:00:00'),
-                                                                                                                                       ('ee555555-6666-7777-8888-999999999999', '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 5, 35, true, NULL, '2024-01-15 10:00:00', '2024-01-15 10:00:00'),
-                                                                                                                                       ('ff666666-7777-8888-9999-aaaaaaaaaaaa', '99999999-aaaa-bbbb-cccc-dddddddddddd', 6, 20, true, NULL, '2024-02-10 11:00:00', '2024-02-10 11:00:00'),
-                                                                                                                                       ('aa777777-8888-9999-aaaa-bbbbbbbbbbbb', '99999999-aaaa-bbbb-cccc-dddddddddddd', 7, 15, true, NULL, '2024-02-10 11:00:00', '2024-02-10 11:00:00'),
-                                                                                                                                       ('bb888888-9999-aaaa-bbbb-cccccccccccc', '88888888-9999-aaaa-bbbb-cccccccccccc', 8, 100, true, 55.00, '2024-02-01 07:30:00', '2024-02-01 07:30:00'),
-                                                                                                                                       ('cc999999-aaaa-bbbb-cccc-dddddddddddd', '88888888-9999-aaaa-bbbb-cccccccccccc', 9, 50, true, NULL, '2024-02-01 07:30:00', '2024-02-01 07:30:00'),
-                                                                                                                                       ('ddaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 'aaaabbbb-cccc-dddd-eeee-ffffffffffff', 10, 75, true, NULL, '2024-02-20 06:00:00', '2024-02-20 06:00:00');
-
--- Insert Inventory Movements
-INSERT INTO public.inventory_movements (id, vendor_inventory_id, movement_type, quantity_change, previous_quantity, new_quantity, reason, created_by, created_at) VALUES
-                                                                                                                                                                      ('a1111111-2222-3333-4444-555555555555', 'aa111111-2222-3333-4444-555555555555', 'stock_in', 50, 0, 50, 'Initial stock', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', '2024-01-10 08:00:00'),
-                                                                                                                                                                      ('b2222222-3333-4444-5555-666666666666', 'bb222222-3333-4444-5555-666666666666', 'stock_in', 30, 0, 30, 'Initial stock', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', '2024-01-10 08:00:00'),
-                                                                                                                                                                      ('c3333333-4444-5555-6666-777777777777', 'aa111111-2222-3333-4444-555555555555', 'sale', -2, 50, 48, 'Order fulfillment', NULL, '2024-01-15 12:30:00'),
-                                                                                                                                                                      ('d4444444-5555-6666-7777-888888888888', 'bb888888-9999-aaaa-bbbb-cccccccccccc', 'stock_in', 100, 0, 100, 'Fresh produce delivery', 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff', '2024-02-01 07:30:00'),
-                                                                                                                                                                      ('e5555555-6666-7777-8888-999999999999', 'bb888888-9999-aaaa-bbbb-cccccccccccc', 'adjustment', -5, 100, 95, 'Damaged items removed', 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff', '2024-02-02 10:00:00'),
-                                                                                                                                                                      ('f6666666-7777-8888-9999-aaaaaaaaaaaa', 'cc999999-aaaa-bbbb-cccc-dddddddddddd', 'stock_in', 50, 0, 50, 'Initial rice stock', 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff', '2024-02-01 07:30:00'),
-                                                                                                                                                                      ('a7777777-8888-9999-aaaa-bbbbbbbbbbbb', 'ddaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 'stock_in', 75, 0, 75, 'Fresh spinach delivery', 'cccccccc-dddd-eeee-ffff-000000000000', '2024-02-20 06:00:00'),
-                                                                                                                                                                      ('b8888888-9999-aaaa-bbbb-cccccccccccc', 'ff666666-7777-8888-9999-aaaaaaaaaaaa', 'sale', -3, 20, 17, 'Pizza orders', NULL, '2024-02-15 19:30:00');
-
 -- Insert Orders
 INSERT INTO orders.orders (id, account_id, user_id, order_time, total_amount, status, location, created_at, updated_at, customer_id, delivery_partner_id, customer_name, customer_address_id, pack_by_time, paid_by_time, delivered_by_time) VALUES
                                                                                                                                                                                                                                                  (1, '69fc8ba4-d11f-4618-9042-c1523d381013', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', '2024-05-22 12:30:00', 500.00, 'completed', 'Delhi', '2024-05-22 12:30:00', '2024-05-22 14:45:00', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 'de111111-2222-3333-4444-555555555555', 'John Doe', '11111111-2222-3333-4444-555555555555', '2024-05-22 13:00:00', '2024-05-22 12:35:00', '2024-05-22 14:45:00'),
@@ -1559,23 +1610,6 @@ INSERT INTO orders.orders (id, account_id, user_id, order_time, total_amount, st
                                                                                                                                                                                                                                                  (6, '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 'ffffffff-0000-1111-2222-333333333333', '2024-05-20 18:30:00', 220.00, 'rejected', 'Hyderabad', '2024-05-20 18:30:00', '2024-05-20 19:00:00', 'ffffffff-0000-1111-2222-333333333333', NULL, 'Neha Gupta', '66666666-7777-8888-9999-aaaaaaaaaaaa', NULL, NULL, NULL),
                                                                                                                                                                                                                                                  (7, 'aaaabbbb-cccc-dddd-eeee-ffffffffffff', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', '2024-05-27 08:15:00', 70.00, 'pending', 'Delhi', '2024-05-27 08:15:00', '2024-05-27 08:15:00', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', NULL, 'John Doe', '11111111-2222-3333-4444-555555555555', NULL, NULL, NULL),
                                                                                                                                                                                                                                                  (8, '99999999-aaaa-bbbb-cccc-dddddddddddd', 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff', '2024-05-28 14:20:00', 750.00, 'accepted', 'Bangalore', '2024-05-28 14:20:00', '2024-05-28 14:35:00', 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff', 'de333333-4444-5555-6666-777777777777', 'Priya Sharma', '22222222-3333-4444-5555-666666666666', '2024-05-28 15:30:00', '2024-05-28 14:25:00', NULL);
-
--- Insert Order Items
-INSERT INTO orders.order_items (id, order_id, item_id, quantity, instructions, is_checked) VALUES
-                                                                                               (1, 1, 1, 2, 'Medium spice level', true),
-                                                                                               (2, 1, 2, 1, 'Extra creamy', true),
-                                                                                               (3, 1, 3, 1, 'Less oil please', true),
-                                                                                               (4, 2, 4, 2, 'Well grilled', true),
-                                                                                               (5, 2, 5, 1, 'Extra butter', false),
-                                                                                               (6, 3, 6, 1, 'Thin crust', true),
-                                                                                               (7, 3, 7, 1, 'Extra cheese', false),
-                                                                                               (8, 4, 3, 1, 'Fragrant rice', false),
-                                                                                               (9, 5, 8, 3, 'Fresh and ripe', false),
-                                                                                               (10, 5, 9, 1, 'Premium quality', false),
-                                                                                               (11, 6, 5, 1, 'Regular preparation', false),
-                                                                                               (12, 7, 10, 2, 'Fresh green leaves', false),
-                                                                                               (13, 8, 6, 2, 'Make it crispy', false),
-                                                                                               (14, 8, 7, 1, 'Extra pepperoni', false);
 
 -- Insert Order Status Logs
 INSERT INTO orders.order_status_logs (id, order_id, status, changed_at) VALUES
@@ -1600,3 +1634,17 @@ INSERT INTO orders.order_status_logs (id, order_id, status, changed_at) VALUES
                                                                             (19, 8, 'pending', '2024-05-28 14:20:00'),
                                                                             (20, 8, 'accepted', '2024-05-28 14:35:00');
 
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Snacks');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Munchies');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Cold drinks');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Juice');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Tea');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Coffee');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Health Drinks');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Snacks');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Snacks & Munchies', 'Munchies');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Cold drinks');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Cold drinks & Juice', 'Juice');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Tea');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Coffee');
+INSERT INTO vendor_items.super_categories (category_name, sub_categories) VALUES ('Tea, Coffee & Health Drinks', 'Health Drink');

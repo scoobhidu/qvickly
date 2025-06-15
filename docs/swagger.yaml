@@ -228,15 +228,6 @@ definitions:
     - item_id
     - stock_quantity
     type: object
-  vendors.Category:
-    properties:
-      id:
-        example: 5
-        type: integer
-      name:
-        example: Pizza
-        type: string
-    type: object
   vendors.CompleteVendorProfile:
     properties:
       account_type:
@@ -517,24 +508,6 @@ info:
   title: Qvickly APIs
   version: "1.0"
 paths:
-  /categories:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all available product categories for filtering and organization
-        purposes
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Categories retrieved successfully
-          schema:
-            items:
-              $ref: '#/definitions/vendors.Category'
-            type: array
-      summary: Get All Categories
-      tags:
-      - categories
   /delivery/order/detail:
     get:
       consumes:
@@ -976,6 +949,18 @@ paths:
       summary: Get Vendor Inventory Summary
       tags:
       - inventory
+  /vendor/categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all available product categories for filtering and organization
+        purposes
+      produces:
+      - application/json
+      responses: {}
+      summary: Get All Categories
+      tags:
+      - categories
   /vendor/orders/order_details:
     get:
       consumes:

@@ -24,32 +24,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/categories": {
-            "get": {
-                "description": "Retrieve all available product categories for filtering and organization purposes",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Get All Categories",
-                "responses": {
-                    "200": {
-                        "description": "Categories retrieved successfully",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/vendors.Category"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/delivery/order/detail": {
             "get": {
                 "description": "Retrieve comprehensive order details for a delivery partner including items, customer info, and earnings",
@@ -484,6 +458,22 @@ const docTemplate = `{
                         }
                     }
                 ],
+                "responses": {}
+            }
+        },
+        "/vendor/categories": {
+            "get": {
+                "description": "Retrieve all available product categories for filtering and organization purposes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get All Categories",
                 "responses": {}
             }
         },
@@ -1244,19 +1234,6 @@ const docTemplate = `{
                     "type": "integer",
                     "minimum": 0,
                     "example": 50
-                }
-            }
-        },
-        "vendors.Category": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 5
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Pizza"
                 }
             }
         },

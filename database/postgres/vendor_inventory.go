@@ -225,7 +225,7 @@ func DeleteInventoryItem(vendorID string, itemID int) (err error) {
 
 func GetItemCategories() (categories []vendors.Category, err error) {
 	ctx := context.Background()
-	rows, err := pgClient.Query(ctx, `SELECT id, name FROM vendor_items.categories ORDER BY name`)
+	rows, err := pgClient.Query(ctx, `select sc.category_name, c.name, c.id from vendor_items.super_categories sc right join vendor_items.categories c on sc.sub_categories = c.name`)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to fetch categories"})
 		return
@@ -234,7 +234,7 @@ func GetItemCategories() (categories []vendors.Category, err error) {
 
 	for rows.Next() {
 		var cat vendors.Category
-		rows.Scan(&cat.ID, &cat.Name)
+		rows.Scan(&cat.SuperCategory, &cat.Name, &cat.ID)
 		categories = append(categories, cat)
 	}
 

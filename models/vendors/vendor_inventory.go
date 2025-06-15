@@ -58,6 +58,7 @@ type SearchItem struct {
 
 // Category represents a product category
 type Category struct {
-	ID   int    `json:"id" example:"5" description:"Unique category ID"`
-	Name string `json:"name" example:"Pizza" description:"Category display name"`
+	SuperCategory string `json:"super_category" example:"Margherita Pizza" description:"Super category"`
+	ID            int    `json:"id" example:"5" description:"Unique category ID"`
+	Name          string `json:"name" example:"Pizza" description:"Category display name"`
 }

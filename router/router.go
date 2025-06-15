@@ -10,6 +10,7 @@ import (
 	recentorders2 "qvickly/src/delivery_ec2/recent_orders"
 	"qvickly/src/delivery_ec2/update_location"
 	"qvickly/src/vendor_ec2/add_item_to_inventory"
+	add_item_to_inventory2 "qvickly/src/vendor_ec2/get_item_categories"
 	"qvickly/src/vendor_ec2/inventory_items"
 	"qvickly/src/vendor_ec2/inventory_summary"
 	"qvickly/src/vendor_ec2/order_details"
@@ -27,6 +28,8 @@ func Router(app *gin.Engine) {
 
 	{
 		group := app.Group("/vendor")
+
+		group.GET("/categories", add_item_to_inventory2.GetCategoriesHandler)
 
 		group.POST("/profile/details", vendor_profile_details.GetVendorProfileDetails)
 		group.POST("/profile/details/create", vendor_profile_details.CreateVendorProfileDetails)

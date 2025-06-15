@@ -1388,3 +1388,11 @@ ALTER table vendor_accounts.vendor_accounts
     add password varchar(20) default substr(md5(random()::text), 0, random(8, 20)) not null;
 
 
+alter table vendor_items.items
+    drop column vendor_id;
+
+create table vendor_items.super_categories
+(
+    category_name  varchar not null,
+    sub_categories text references vendor_items.categories(name)
+)
