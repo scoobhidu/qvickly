@@ -57,7 +57,7 @@ func GetVendorTodaysOrderSummary(vendorId string) (orderSummary *vendors.TodayOr
 	return
 }
 
-func GetVendorOrderDetails(orderID string) (*vendors.OrderDetailsResponse, error) {
+func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 	ctx := context.Background()
 
 	// Main query to get order details with delivery partner and customer info
