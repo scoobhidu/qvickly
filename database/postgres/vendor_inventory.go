@@ -33,10 +33,11 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 	totalCount = 0
 
 	// Build query with filters
+	//	JOIN vendor_items.item_images ii ON vi.item_id = ii.item_id
 	baseQuery := `
-		FROM vendor_inventory vi
-		JOIN items i ON vi.item_id = i.id
-		JOIN categories c ON i.category_id = c.id
+		FROM public.vendor_inventory vi
+		JOIN vendor_items.items i ON vi.item_id = i.id
+		JOIN vendor_items.categories c ON i.category_id = c.id
 		WHERE vi.vendor_id = $1::uuid AND i.is_active = true`
 
 	args := []interface{}{vendorID}
@@ -71,11 +72,12 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 		return
 	}
 
+	//COALESCE(ii.image_url, '') as image_url,
 	// Get items
 	itemsQuery := `
 		SELECT 
 			vi.id, vi.item_id, i.name, i.description, i.category_id, c.name as category_name,
-			COALESCE(i.image_url, '') as image_url, vi.stock_quantity, vi.is_available,
+			vi.stock_quantity, vi.is_available,
 			COALESCE(vi.price_override, i.price_retail) as price, vi.price_override,
 			CASE WHEN vi.stock_quantity = 0 THEN true ELSE false END as out_of_stock
 		` + baseQuery + `
@@ -96,8 +98,11 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 	for rows.Next() {
 		var item vendors.InventoryItem
 		err = rows.Scan(
-			&item.ID, &item.ItemID, &item.Name, &item.Description, &item.CategoryID,
-			&item.CategoryName, &item.ImageURL, &item.StockQuantity, &item.IsAvailable,
+			&item.ID,
+			&item.ItemID, &item.Name, &item.Description, &item.CategoryID,
+			&item.CategoryName,
+			//&item.ImageURL,
+			&item.StockQuantity, &item.IsAvailable,
 			&item.Price, &item.PriceOverride, &item.OutOfStock)
 		if err != nil {
 			totalCount = 0

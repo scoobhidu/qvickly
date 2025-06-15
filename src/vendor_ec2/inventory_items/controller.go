@@ -44,7 +44,7 @@ func GetVendorInventoryHandler(c *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	totalCount, items, err := postgres.GetInventoryItemsPagination(vendorID, categoryID, search, filter, offset, limit)
+	totalCount, items, err := postgres.GetInventoryItemsPagination(vendorID, categoryID, search, filter, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to fetch items | " + err.Error()})
 	}

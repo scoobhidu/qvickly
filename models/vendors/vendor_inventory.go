@@ -1,19 +1,21 @@
 package vendors
 
+import "github.com/google/uuid"
+
 // InventoryItem represents an item in vendor's inventory with stock and pricing details
 type InventoryItem struct {
-	ID            int      `json:"id" example:"1001" description:"Unique inventory record ID"`
-	ItemID        int      `json:"item_id" example:"456" description:"Reference to the master item catalog"`
-	Name          string   `json:"name" example:"Margherita Pizza" description:"Display name of the item"`
-	Description   string   `json:"description" example:"Classic pizza with fresh tomatoes, mozzarella cheese, and basil" description:"Detailed description of the item"`
-	CategoryID    int      `json:"category_id" example:"5" description:"ID of the category this item belongs to"`
-	CategoryName  string   `json:"category_name" example:"Pizza" description:"Name of the category this item belongs to"`
-	ImageURL      string   `json:"image_url" example:"https://my-bucket.s3.amazonaws.com/items/margherita-pizza.jpg" description:"URL to the item's display image"`
-	StockQuantity int      `json:"stock_quantity" example:"25" minimum:"0" description:"Current available quantity in stock"`
-	IsAvailable   bool     `json:"is_available" example:"true" description:"Whether the item is currently available for ordering"`
-	Price         float64  `json:"price" example:"12.99" minimum:"0" description:"Current selling price (includes any vendor override)"`
-	PriceOverride *float64 `json:"price_override" example:"11.99" minimum:"0" description:"Vendor-specific price override (null if using default price)"`
-	OutOfStock    bool     `json:"out_of_stock" example:"false" description:"Calculated field: true if stock_quantity is 0"`
+	ID            uuid.UUID `json:"id" example:"1001" description:"Unique inventory record ID"`
+	ItemID        int       `json:"item_id" example:"456" description:"Reference to the master item catalog"`
+	Name          string    `json:"name" example:"Margherita Pizza" description:"Display name of the item"`
+	Description   string    `json:"description" example:"Classic pizza with fresh tomatoes, mozzarella cheese, and basil" description:"Detailed description of the item"`
+	CategoryID    int       `json:"category_id" example:"5" description:"ID of the category this item belongs to"`
+	CategoryName  string    `json:"category_name" example:"Pizza" description:"Name of the category this item belongs to"`
+	ImageURL      string    `json:"image_url" example:"https://my-bucket.s3.amazonaws.com/items/margherita-pizza.jpg" description:"URL to the item's display image"`
+	StockQuantity int       `json:"stock_quantity" example:"25" minimum:"0" description:"Current available quantity in stock"`
+	IsAvailable   bool      `json:"is_available" example:"true" description:"Whether the item is currently available for ordering"`
+	Price         float64   `json:"price" example:"12.99" minimum:"0" description:"Current selling price (includes any vendor override)"`
+	PriceOverride *float64  `json:"price_override" example:"11.99" minimum:"0" description:"Vendor-specific price override (null if using default price)"`
+	OutOfStock    bool      `json:"out_of_stock" example:"false" description:"Calculated field: true if stock_quantity is 0"`
 }
 
 // InventorySummary provides overview statistics of vendor's inventory
