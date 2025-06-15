@@ -29,7 +29,7 @@ func GetVendorOrderDetail(ctx *gin.Context) {
 			ctx.JSON(500, gin.H{"error": "order not found"})
 			return
 		}
-		ctx.JSON(500, gin.H{"error": "Internal server error"})
+		ctx.JSON(500, gin.H{"error": "Internal server error" + err.Error()})
 		return
 	}
 
