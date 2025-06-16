@@ -477,6 +477,52 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/vendor/inventory/search": {
+            "post": {
+                "description": "Search for items that vendors can add to their inventory with various filtering options",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Search items with advanced filters",
+                "parameters": [
+                    {
+                        "description": "Search filters, if 0 then that means all category IDs",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/vendors.SearchFilters"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful search results",
+                        "schema": {
+                            "$ref": "#/definitions/vendors.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/vendors.SearchResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/vendors.SearchResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/vendor/orders/order_details": {
             "get": {
                 "description": "Retrieve comprehensive details about a specific order including delivery information, customer details, and all items",
@@ -1225,15 +1271,24 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 456
                 },
-                "price_override": {
-                    "type": "number",
-                    "minimum": 0,
-                    "example": 11.99
-                },
                 "stock_quantity": {
                     "type": "integer",
                     "minimum": 0,
                     "example": 50
+                }
+            }
+        },
+        "vendors.CategorySummary": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "item_count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1304,6 +1359,17 @@ const docTemplate = `{
                 }
             }
         },
+        "vendors.ErrorDetail": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "vendors.GetVendorProfileRequestBody": {
             "type": "object",
             "properties": {
@@ -1331,6 +1397,59 @@ const docTemplate = `{
                 "total_items": {
                     "type": "integer",
                     "example": 150
+                }
+            }
+        },
+        "vendors.Item": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_available": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price_retail": {
+                    "type": "number"
+                },
+                "price_wholesale": {
+                    "type": "number"
+                },
+                "search_keywords": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "vendor_id": {
+                    "type": "string"
+                },
+                "vendor_name": {
+                    "type": "string"
                 }
             }
         },
@@ -1509,6 +1628,94 @@ const docTemplate = `{
                 "total_pages": {
                     "type": "integer",
                     "example": 13
+                }
+            }
+        },
+        "vendors.PaginationInfo": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "has_next": {
+                    "type": "boolean"
+                },
+                "has_previous": {
+                    "type": "boolean"
+                },
+                "items_per_page": {
+                    "type": "integer"
+                },
+                "total_items": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "vendors.SearchData": {
+            "type": "object",
+            "properties": {
+                "applied_filters": {
+                    "$ref": "#/definitions/vendors.SearchFilters"
+                },
+                "available_categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/vendors.CategorySummary"
+                    }
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/vendors.Item"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/vendors.PaginationInfo"
+                }
+            }
+        },
+        "vendors.SearchFilters": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "description": "Filter by category",
+                    "type": "integer",
+                    "example": 0
+                },
+                "limit": {
+                    "description": "Items per page",
+                    "type": "integer",
+                    "example": 10
+                },
+                "page": {
+                    "description": "Pagination page number",
+                    "type": "integer",
+                    "example": 1
+                },
+                "query": {
+                    "description": "Search term for name/description/keywords",
+                    "type": "string",
+                    "example": "Lay's'"
+                }
+            }
+        },
+        "vendors.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/vendors.SearchData"
+                },
+                "error": {
+                    "$ref": "#/definitions/vendors.ErrorDetail"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

@@ -216,10 +216,6 @@ definitions:
       item_id:
         example: 456
         type: integer
-      price_override:
-        example: 11.99
-        minimum: 0
-        type: number
       stock_quantity:
         example: 50
         minimum: 0
@@ -227,6 +223,15 @@ definitions:
     required:
     - item_id
     - stock_quantity
+    type: object
+  vendors.CategorySummary:
+    properties:
+      id:
+        type: integer
+      item_count:
+        type: integer
+      name:
+        type: string
     type: object
   vendors.CompleteVendorProfile:
     properties:
@@ -279,6 +284,13 @@ definitions:
         example: "+1234567890"
         type: string
     type: object
+  vendors.ErrorDetail:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
   vendors.GetVendorProfileRequestBody:
     properties:
       password:
@@ -299,6 +311,41 @@ definitions:
       total_items:
         example: 150
         type: integer
+    type: object
+  vendors.Item:
+    properties:
+      account_id:
+        type: string
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      is_available:
+        type: boolean
+      name:
+        type: string
+      price_retail:
+        type: number
+      price_wholesale:
+        type: number
+      search_keywords:
+        type: string
+      stock:
+        type: integer
+      updated_at:
+        type: string
+      vendor_id:
+        type: string
+      vendor_name:
+        type: string
     type: object
   vendors.OrderDetailsResponse:
     properties:
@@ -432,6 +479,66 @@ definitions:
       total_pages:
         example: 13
         type: integer
+    type: object
+  vendors.PaginationInfo:
+    properties:
+      current_page:
+        type: integer
+      has_next:
+        type: boolean
+      has_previous:
+        type: boolean
+      items_per_page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  vendors.SearchData:
+    properties:
+      applied_filters:
+        $ref: '#/definitions/vendors.SearchFilters'
+      available_categories:
+        items:
+          $ref: '#/definitions/vendors.CategorySummary'
+        type: array
+      items:
+        items:
+          $ref: '#/definitions/vendors.Item'
+        type: array
+      pagination:
+        $ref: '#/definitions/vendors.PaginationInfo'
+    type: object
+  vendors.SearchFilters:
+    properties:
+      category_id:
+        description: Filter by category
+        example: 0
+        type: integer
+      limit:
+        description: Items per page
+        example: 10
+        type: integer
+      page:
+        description: Pagination page number
+        example: 1
+        type: integer
+      query:
+        description: Search term for name/description/keywords
+        example: Lay's'
+        type: string
+    type: object
+  vendors.SearchResponse:
+    properties:
+      data:
+        $ref: '#/definitions/vendors.SearchData'
+      error:
+        $ref: '#/definitions/vendors.ErrorDetail'
+      message:
+        type: string
+      success:
+        type: boolean
     type: object
   vendors.TodayOrderSummary:
     properties:
@@ -961,6 +1068,37 @@ paths:
       summary: Get All Categories
       tags:
       - categories
+  /vendor/inventory/search:
+    post:
+      consumes:
+      - application/json
+      description: Search for items that vendors can add to their inventory with various
+        filtering options
+      parameters:
+      - description: Search filters, if 0 then that means all category IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/vendors.SearchFilters'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful search results
+          schema:
+            $ref: '#/definitions/vendors.SearchResponse'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/vendors.SearchResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/vendors.SearchResponse'
+      summary: Search items with advanced filters
+      tags:
+      - Items
   /vendor/orders/order_details:
     get:
       consumes:

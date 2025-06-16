@@ -225,8 +225,9 @@ func getOrderItems(orderID int) ([]delivery.OrderItemDetail, error) {
 				(SELECT image_url FROM vendor_items.item_images 
 				 WHERE item_id = oi.item_id AND position = 1 LIMIT 1),
 				-- If no vendor item images, try qvickly products
-				(SELECT image_url FROM qvickly_grocery_products.items 
-				 WHERE id = oi.item_id LIMIT 1)
+				''
+-- 				(SELECT image_url FROM qvickly_grocery_products.items 
+-- 				 WHERE id = oi.item_id LIMIT 1)
 			) as image_url
 		FROM orders.order_items oi
 		JOIN vendor_items.items vi ON oi.item_id = vi.id
