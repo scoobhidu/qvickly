@@ -14,7 +14,7 @@ type InventoryItem struct {
 	StockQuantity int       `json:"stock_quantity" example:"25" minimum:"0" description:"Current available quantity in stock"`
 	IsAvailable   bool      `json:"is_available" example:"true" description:"Whether the item is currently available for ordering"`
 	Price         float64   `json:"price" example:"12.99" minimum:"0" description:"Current selling price (includes any vendor override)"`
-	PriceOverride *float64  `json:"price_override" example:"11.99" minimum:"0" description:"Vendor-specific price override (null if using default price)"`
+	PriceOverride *float64  `json:"price_wholesale" example:"11.99" minimum:"0" description:"Vendor-specific price override (null if using default price)"`
 	OutOfStock    bool      `json:"out_of_stock" example:"false" description:"Calculated field: true if stock_quantity is 0"`
 }
 

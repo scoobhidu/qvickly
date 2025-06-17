@@ -78,7 +78,7 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 		SELECT 
 			vi.id, vi.item_id, i.name, i.description, i.category_id, c.name as category_name,
 			vi.stock_quantity, vi.is_available,
-			COALESCE(vi.price_override, i.price_retail) as price, vi.price_override,
+			COALESCE(vi.price_override, i.price_retail) as price, i.price_wholesale,
 			CASE WHEN vi.stock_quantity = 0 THEN true ELSE false END as out_of_stock
 		` + baseQuery + `
 		ORDER BY i.name ASC
