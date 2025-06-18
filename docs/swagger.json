@@ -926,7 +926,7 @@
                 "responses": {}
             },
             "post": {
-                "description": "”",
+                "description": "”\"",
                 "consumes": [
                     "application/json"
                 ],

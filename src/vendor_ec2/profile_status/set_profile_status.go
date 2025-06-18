@@ -12,7 +12,7 @@ type RequestBody struct {
 
 // SetProfileStatus godoc
 // @Summary Get profile live or not status
-// @Description ”
+// @Description ”"
 // @Tags profile
 // @Accept json
 // @Produce json

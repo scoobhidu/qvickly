@@ -934,7 +934,7 @@ const docTemplate = `{
                 "responses": {}
             },
             "post": {
-                "description": "”",
+                "description": "”\"",
                 "consumes": [
                     "application/json"
                 ],
