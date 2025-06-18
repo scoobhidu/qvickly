@@ -20,3 +20,21 @@ func AddVendorProfile(data vendors.CompleteVendorProfile) (err error) {
 
 	return
 }
+
+func GetProfileVendorStatus(vendorId string) (status bool, err error) {
+	err = pgPool.QueryRow(context.Background(), `SELECT live_status FROM postgres.vendor_accounts.vendor_accounts where id=$1::uuid`, vendorId).Scan(&status)
+	if err != nil {
+		status = false
+	}
+
+	return
+}
+
+func SetProfileVendorStatus(vendorId string, status bool) (err error) {
+	_, err = pgPool.Exec(context.Background(), `UPDATE postgres.vendor_accounts.vendor_accounts  set live_status = $2 where id=$1::uuid`, vendorId, status)
+	if err != nil {
+		return err
+	}
+
+	return
+}

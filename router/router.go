@@ -15,6 +15,7 @@ import (
 	"qvickly/src/vendor_ec2/inventory_summary"
 	"qvickly/src/vendor_ec2/order_details"
 	"qvickly/src/vendor_ec2/profile_details"
+	"qvickly/src/vendor_ec2/profile_status"
 	"qvickly/src/vendor_ec2/recent_orders"
 	"qvickly/src/vendor_ec2/remove_item_from_inventory"
 	"qvickly/src/vendor_ec2/search_items_for_inventory_addition"
@@ -47,6 +48,9 @@ func Router(app *gin.Engine) {
 		group.POST("/:vendor_id/inventory", add_item_to_inventory.AddItemToInventoryHandler)
 		group.PUT("/:vendor_id/inventory/:item_id", update_inventory.UpdateInventoryItemHandler)
 		group.DELETE("/:vendor_id/inventory/:item_id", remove_item_from_inventory.RemoveItemFromInventoryHandler)
+
+		group.GET("/:vendor_id/profile/status", profile_status.GetProfileStatus)
+		group.POST("/:vendor_id/profile/status", profile_status.SetProfileStatus)
 		//group.POST("/:vendor_id/inventory/movement", BulkInventoryMovementHandler)
 	}
 

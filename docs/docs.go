@@ -909,6 +909,63 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/vendor/{vendor_id}/profile/status": {
+            "get": {
+                "description": "”",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Get profile live or not status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vendor ID",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "description": "”",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Get profile live or not status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vendor ID",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Status to be set",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile_status.RequestBody"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/verify-otp": {
             "post": {
                 "description": "Verify the OTP code sent via SMS or WhatsApp, create user account if new, and return JWT access token",
@@ -1222,6 +1279,14 @@ const docTemplate = `{
                 },
                 "verified_at": {
                     "type": "string"
+                }
+            }
+        },
+        "profile_status.RequestBody": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "boolean"
                 }
             }
         },

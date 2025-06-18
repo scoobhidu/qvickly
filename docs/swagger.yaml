@@ -188,6 +188,11 @@ definitions:
       verified_at:
         type: string
     type: object
+  profile_status.RequestBody:
+    properties:
+      status:
+        type: boolean
+    type: object
   send_otp.Request:
     properties:
       phone:
@@ -1056,6 +1061,45 @@ paths:
       summary: Get Vendor Inventory Summary
       tags:
       - inventory
+  /vendor/{vendor_id}/profile/status:
+    get:
+      consumes:
+      - application/json
+      description: ”
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Get profile live or not status
+      tags:
+      - profile
+    post:
+      consumes:
+      - application/json
+      description: ”
+      parameters:
+      - description: Vendor ID
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      - description: Status to be set
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/profile_status.RequestBody'
+      produces:
+      - application/json
+      responses: {}
+      summary: Get profile live or not status
+      tags:
+      - profile
   /vendor/categories:
     get:
       consumes:
