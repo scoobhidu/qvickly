@@ -32,7 +32,7 @@ func ExecuteItemSearch(filters vendors.SearchFilters) ([]vendors.Item, error) {
 			" OFFSET " + strconv.Itoa(offset)
 	}
 
-	rows, err := pgClient.Query(context.Background(), baseQuery)
+	rows, err := pgPool.Query(context.Background(), baseQuery)
 	if err != nil {
 		return nil, fmt.Errorf("search query failed: %v", err)
 	}

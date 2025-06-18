@@ -39,7 +39,7 @@ func GetDeliveryPartnerProfileDetails(partnerID uuid.UUID) (profile delivery.Del
 		WHERE id = $1
 	`
 
-	err = pgClient.QueryRow(context.Background(), query, partnerID).Scan(
+	err = pgPool.QueryRow(context.Background(), query, partnerID).Scan(
 		&profile.ID,
 		&profile.Name,
 		&profile.PhoneNumber,

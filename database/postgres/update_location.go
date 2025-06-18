@@ -14,7 +14,7 @@ func ProcessLocationUpdate(partnerID uuid.UUID, latitude, longitude float64) err
 	now := time.Now()
 
 	// Start transaction
-	tx, err := pgClient.Begin(context.Background())
+	tx, err := pgPool.Begin(context.Background())
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,7 @@ import (
 
 func GetVendorTodaysOrderSummary(vendorId string) (orderSummary *vendors.TodayOrderSummary, err error) {
 	orderSummary = new(vendors.TodayOrderSummary)
-	rows, err := pgClient.Query(context.Background(), `select distinct(status), count(*) from postgres.orders.orders where Date(created_at) = CURRENT_DATE and account_id=$1 group by status`, vendorId)
+	rows, err := pgPool.Query(context.Background(), `select distinct(status), count(*) from postgres.orders.orders where Date(created_at) = CURRENT_DATE and account_id=$1 group by status`, vendorId)
 	defer rows.Close()
 	if errors.Is(err, pgx.ErrNoRows) {
 		orderSummary = nil
@@ -83,7 +83,7 @@ func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 	var deliveryPartnerPin, deliveryPartnerName, deliveryPartnerPhone *string
 	var packByTime, paidByTime, deliveredByTime *time.Time
 
-	err := pgClient.QueryRow(ctx, mainQuery, orderID).Scan(
+	err := pgPool.QueryRow(ctx, mainQuery, orderID).Scan(
 		&deliveryPartnerPin,
 		&deliveryPartnerName,
 		&deliveryPartnerPhone,
@@ -120,11 +120,11 @@ func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 		ORDER BY changed_at DESC 
 		LIMIT 1`
 
-	err = pgClient.QueryRow(ctx, statusQuery, orderID).Scan(&response.OrderStatus)
+	err = pgPool.QueryRow(ctx, statusQuery, orderID).Scan(&response.OrderStatus)
 	if err != nil {
 		// If no status logs exist, use order.status as fallback
 		fallbackQuery := `SELECT status FROM orders.orders WHERE id = $1`
-		err = pgClient.QueryRow(ctx, fallbackQuery, orderID).Scan(&response.OrderStatus)
+		err = pgPool.QueryRow(ctx, fallbackQuery, orderID).Scan(&response.OrderStatus)
 		if err != nil {
 			return nil, err
 		}
@@ -142,7 +142,7 @@ func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 		JOIN vendor_items.item_images ii ON oi.item_id = ii.item_id
 		WHERE oi.order_id = $1`
 
-	rows, err := pgClient.Query(ctx, itemsQuery, orderID)
+	rows, err := pgPool.Query(ctx, itemsQuery, orderID)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func UpdateOrderStatus(orderID, newStatus string) error {
 	updateTime := time.Now()
 
 	// Update orders table
-	_, err := pgClient.Exec(ctx,
+	_, err := pgPool.Exec(ctx,
 		`UPDATE orders.orders SET status = $1, updated_at = $2 WHERE id = $3`,
 		newStatus, updateTime, orderID)
 
@@ -186,7 +186,7 @@ func UpdateOrderStatus(orderID, newStatus string) error {
 	}
 
 	// Insert into status logs
-	_, err = pgClient.Exec(ctx,
+	_, err = pgPool.Exec(ctx,
 		`INSERT INTO orders.order_status_logs (order_id, status, changed_at) 
 			 VALUES ($1, $2, $3)
 			 ON CONFLICT (order_id) 
@@ -207,7 +207,7 @@ func GetVendorOrders(vendorID string, page, limit int) (*vendors.OrdersListRespo
 	// Get total count first
 	var totalCount int
 	countQuery := `SELECT COUNT(*) FROM orders.orders WHERE account_id = $1::uuid`
-	err := pgClient.QueryRow(ctx, countQuery, vendorID).Scan(&totalCount)
+	err := pgPool.QueryRow(ctx, countQuery, vendorID).Scan(&totalCount)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +235,7 @@ func GetVendorOrders(vendorID string, page, limit int) (*vendors.OrdersListRespo
 		ORDER BY o.order_time DESC
 		LIMIT $2 OFFSET $3`
 
-	rows, err := pgClient.Query(ctx, ordersQuery, vendorID, limit, offset)
+	rows, err := pgPool.Query(ctx, ordersQuery, vendorID, limit, offset)
 	if err != nil {
 		return nil, err
 	}

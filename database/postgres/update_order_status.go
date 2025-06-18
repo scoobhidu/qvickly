@@ -12,7 +12,7 @@ import (
 // ProcessPickupVerification handles the main pickup verification logic
 func ProcessPickupVerification(orderID int, deliveryPartnerID uuid.UUID, providedPin int) (*delivery.VerifyPickupResponse, error) {
 	// Start database transaction
-	tx, err := pgClient.Begin(context.Background())
+	tx, err := pgPool.Begin(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func GetCurrentOrderStatus(orderID int) string {
 	var status string
 	query := `SELECT status FROM orders.orders WHERE id = $1`
 
-	err := pgClient.QueryRow(context.Background(), query, orderID).Scan(&status)
+	err := pgPool.QueryRow(context.Background(), query, orderID).Scan(&status)
 	if err != nil {
 		return "unknown"
 	}

@@ -14,7 +14,7 @@ func GetInventorySummaryData(vendorID string) (summary *vendors.InventorySummary
 	query := `SELECT total_items, in_stock_items, out_of_stock_items FROM vendor_inventory_summary WHERE vendor_id = $1::uuid`
 
 	summary = new(vendors.InventorySummary)
-	err = pgClient.QueryRow(ctx, query, vendorID).Scan(
+	err = pgPool.QueryRow(ctx, query, vendorID).Scan(
 		&summary.TotalItems, &summary.InStockItems, &summary.OutOfStockItems)
 
 	if err != nil {
@@ -65,7 +65,7 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 	// Get total count
 	countQuery := `SELECT COUNT(*) ` + baseQuery
 
-	err = pgClient.QueryRow(context.Background(), countQuery, args...).Scan(&totalCount)
+	err = pgPool.QueryRow(context.Background(), countQuery, args...).Scan(&totalCount)
 	if err != nil {
 		items = nil
 		totalCount = 0
@@ -86,7 +86,7 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 
 	args = append(args, limit, offset)
 
-	rows, err := pgClient.Query(context.Background(), itemsQuery, args...)
+	rows, err := pgPool.Query(context.Background(), itemsQuery, args...)
 	if err != nil {
 		totalCount = 0
 		items = nil
@@ -117,7 +117,7 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 func AddItemsToInventory(vendorID string, req vendors.AddItemToInventoryRequest) (err error) {
 	var tx pgx.Tx
 	ctx := context.Background()
-	tx, err = pgClient.Begin(ctx)
+	tx, err = pgPool.Begin(ctx)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Transaction failed"})
 		return
@@ -159,7 +159,7 @@ func UpdateInventoryItem(vendorID string, itemID int, req vendors.UpdateInventor
 	// Get current inventory record
 	var currentStock int
 	var inventoryID string
-	err = pgClient.QueryRow(ctx, `
+	err = pgPool.QueryRow(ctx, `
 		SELECT id, stock_quantity FROM vendor_inventory 
 		WHERE vendor_id = $1::uuid AND item_id = $2`,
 		vendorID, itemID).Scan(&inventoryID, &currentStock)
@@ -199,7 +199,7 @@ func UpdateInventoryItem(vendorID string, itemID int, req vendors.UpdateInventor
 	updateQuery := `UPDATE vendor_inventory SET ` + strings.Join(updateParts, ", ") +
 		` WHERE vendor_id = $1::uuid AND item_id = $2`
 
-	_, err = pgClient.Exec(ctx, updateQuery, args...)
+	_, err = pgPool.Exec(ctx, updateQuery, args...)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to update inventory"})
 		return
@@ -210,7 +210,7 @@ func UpdateInventoryItem(vendorID string, itemID int, req vendors.UpdateInventor
 		movementType := "adjustment"
 		quantityChange := *req.StockQuantity - currentStock
 
-		_, err = pgClient.Exec(ctx, `
+		_, err = pgPool.Exec(ctx, `
 			INSERT INTO inventory_movements (vendor_inventory_id, movement_type, quantity_change, previous_quantity, new_quantity, reason, created_at)
 			VALUES ($1::uuid, $2, $3, $4, $5, 'Manual adjustment', CURRENT_TIMESTAMP)`,
 			inventoryID, movementType, quantityChange, currentStock, *req.StockQuantity)
@@ -221,7 +221,7 @@ func UpdateInventoryItem(vendorID string, itemID int, req vendors.UpdateInventor
 
 func DeleteInventoryItem(vendorID string, itemID int) (err error) {
 	ctx := context.Background()
-	_, err = pgClient.Exec(ctx, `
+	_, err = pgPool.Exec(ctx, `
 		DELETE FROM vendor_inventory 
 		WHERE vendor_id = $1::uuid AND item_id = $2`,
 		vendorID, itemID)
@@ -230,7 +230,7 @@ func DeleteInventoryItem(vendorID string, itemID int) (err error) {
 
 func GetItemCategories() (categories []vendors.Category, err error) {
 	ctx := context.Background()
-	rows, err := pgClient.Query(ctx, `select sc.category_name, c.name, c.id from vendor_items.super_categories sc right join vendor_items.categories c on sc.sub_categories = c.name`)
+	rows, err := pgPool.Query(ctx, `select sc.category_name, c.name, c.id from vendor_items.super_categories sc right join vendor_items.categories c on sc.sub_categories = c.name`)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to fetch categories"})
 		return

@@ -2,12 +2,12 @@ package postgres
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"os"
 )
 
-var pgClient *pgx.Conn
+var pgPool *pgxpool.Pool
 
 func InitConn() (err error) {
 	connConfig := "user=" + os.Getenv("user") +
@@ -18,7 +18,7 @@ func InitConn() (err error) {
 	// postgres://jack:secret@foo.example.com:5432,bar.example.com:5432/mydb
 	// context.Background gives an empty context, don't want to give it a time to close automatically
 	// if the connection does not happen within t time
-	pgClient, err = pgx.Connect(context.Background(), connConfig)
+	pgPool, err = pgxpool.New(context.Background(), connConfig)
 
 	if err != nil {
 		log.Panicf("Unable to connect to database: %v\n", err) // printf followed by panic(), no need for os.Exit as panic will exit
@@ -27,10 +27,7 @@ func InitConn() (err error) {
 }
 
 func CloseConn() {
-	err := pgClient.Close(context.Background())
-	if err != nil {
-		log.Panicf("Unable to close the connection to database: %v\n", err)
-	}
+	defer pgPool.Close()
 }
 
 //const (
@@ -146,7 +143,7 @@ func CloseConn() {
 //
 //	log.Println(query)
 //
-//	_, err = pgClient.Exec(context.Background(), query)
+//	_, err = pgPool.Exec(context.Background(), query)
 //	if err != nil {
 //		log.Println("There was an error executing this query" + err.Error())
 //		return
@@ -199,7 +196,7 @@ func CloseConn() {
 //
 //				log.Println(query)
 //
-//				_, err = pgClient.Exec(context.Background(), query)
+//				_, err = pgPool.Exec(context.Background(), query)
 //				if err != nil {
 //					log.Println("There was an error executing this query" + err.Error())
 //				}
@@ -219,7 +216,7 @@ func CloseConn() {
 //
 //		log.Println(query)
 //
-//		_, err = pgClient.Exec(context.Background(), query)
+//		_, err = pgPool.Exec(context.Background(), query)
 //		if err != nil {
 //			log.Println("There was an error executing this query" + err.Error())
 //			return
@@ -268,7 +265,7 @@ func CloseConn() {
 //
 //	log.Println(query)
 //
-//	_, err = pgClient.Exec(context.Background(), query)
+//	_, err = pgPool.Exec(context.Background(), query)
 //	if err != nil {
 //		log.Println("There was an error executing this query" + err.Error())
 //		return
@@ -334,7 +331,7 @@ func CloseConn() {
 //
 //	log.Println(query)
 //
-//	_, err = pgClient.Exec(context.Background(), query)
+//	_, err = pgPool.Exec(context.Background(), query)
 //	if err != nil {
 //		log.Println("There was an error executing this query" + err.Error())
 //		return

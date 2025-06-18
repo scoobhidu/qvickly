@@ -24,7 +24,7 @@ func GetBasicOrdersSummary(partnerID uuid.UUID) (*delivery.OrdersSummaryResponse
 	var completedCount int
 	var totalEarnings float64
 
-	err := pgClient.QueryRow(context.Background(), completedQuery, partnerID).Scan(&completedCount, &totalEarnings)
+	err := pgPool.QueryRow(context.Background(), completedQuery, partnerID).Scan(&completedCount, &totalEarnings)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func GetBasicOrdersSummary(partnerID uuid.UUID) (*delivery.OrdersSummaryResponse
 	`
 
 	var activeCount int
-	err = pgClient.QueryRow(context.Background(), activeQuery, partnerID).Scan(&activeCount)
+	err = pgPool.QueryRow(context.Background(), activeQuery, partnerID).Scan(&activeCount)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func GetBasicRecentOrders(partnerID uuid.UUID, limit int, statusFilter string) (
 		LIMIT $` + strconv.Itoa(argIndex)
 	args = append(args, limit)
 
-	rows, err := pgClient.Query(context.Background(), baseQuery, args...)
+	rows, err := pgPool.Query(context.Background(), baseQuery, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func GetOrderDetail(orderID int, partnerID uuid.UUID) (*delivery.OrderDetailResp
 	var deliveryLatitude sql.NullFloat64
 	var deliveryLongitude sql.NullFloat64
 
-	err := pgClient.QueryRow(context.Background(), orderQuery, orderID, partnerID).Scan(
+	err := pgPool.QueryRow(context.Background(), orderQuery, orderID, partnerID).Scan(
 		&detail.ID,
 		&detail.Status,
 		&detail.DeliveryFee,
@@ -235,7 +235,7 @@ func getOrderItems(orderID int) ([]delivery.OrderItemDetail, error) {
 		ORDER BY oi.id
 	`
 
-	rows, err := pgClient.Query(context.Background(), itemsQuery, orderID)
+	rows, err := pgPool.Query(context.Background(), itemsQuery, orderID)
 	if err != nil {
 		return nil, err
 	}
