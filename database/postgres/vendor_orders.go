@@ -263,7 +263,8 @@ func GetVendorOrders(vendorID string, page, limit int) (*vendors.OrdersListRespo
 		)
 
 		if order.PackByTime == nil {
-			*order.PackByTime = order.OrderTimePlaced.Add(time.Minute * 12)
+			newTime := order.OrderTimePlaced.Add(time.Minute * 12)
+			order.PackByTime = &(newTime)
 		}
 
 		if err != nil {
