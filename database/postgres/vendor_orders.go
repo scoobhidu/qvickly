@@ -176,10 +176,17 @@ func UpdateOrderStatus(orderID, newStatus string) error {
 	ctx := context.Background()
 	updateTime := time.Now()
 
-	// Update orders table
-	_, err := pgPool.Exec(ctx,
-		`UPDATE orders.orders SET status = $1, updated_at = $2 WHERE id = $3`,
-		newStatus, updateTime, orderID)
+	var err error
+
+	if newStatus == "pending" {
+		_, err = pgPool.Exec(ctx,
+			`UPDATE orders.orders SET status = $1, updated_at = $2, pack_by_time = $2 WHERE id = $3`,
+			newStatus, updateTime, updateTime.Add(time.Minute*12), orderID)
+	} else {
+		_, err = pgPool.Exec(ctx,
+			`UPDATE orders.orders SET status = $1, updated_at = $2 WHERE id = $3`,
+			newStatus, updateTime, orderID)
+	}
 
 	if err != nil {
 		return err
@@ -254,6 +261,11 @@ func GetVendorOrders(vendorID string, page, limit int) (*vendors.OrdersListRespo
 			&order.DeliveredByTime,
 			&order.PickByTime,
 		)
+
+		if order.PackByTime == nil {
+			*order.PackByTime = order.OrderTimePlaced.Add(time.Minute * 12)
+		}
+
 		if err != nil {
 			return nil, err
 		}
