@@ -53,7 +53,7 @@ services:
       - port=5432
       - user=postgres
       - password=postgres
-      - dbname=postgres
+      - dbname=quickkart
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - GO_ENV=production
@@ -99,7 +99,7 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: quickkart
     command: |
       bash -c 'while true; do
         pg_dump -h postgres -U postgres postgres > /backup/backup_$$(date +%Y%m%d_%H%M%S).sql;

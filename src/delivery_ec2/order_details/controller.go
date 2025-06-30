@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"qvickly/database/postgres"
 	"qvickly/models/delivery"
-	"strconv"
 )
 
 // GetDeliveryOrderDetail godoc
@@ -40,7 +39,7 @@ func GetDeliveryOrderDetail(c *gin.Context) {
 	}
 
 	// Validate and parse order ID
-	orderID, err := strconv.Atoi(orderIDParam)
+	orderID, err := uuid.Parse(orderIDParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, delivery.ErrorResponse{
 			Error:   "invalid_order_id",

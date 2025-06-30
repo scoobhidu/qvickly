@@ -61,7 +61,7 @@ func UpdateDeliveryPartnerLocation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 // isValidCoordinates validates latitude and longitude ranges

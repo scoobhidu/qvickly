@@ -23,7 +23,7 @@ ENV user="postgres"
 ENV password="postgres"
 ENV host="localhost"
 ENV port="5432"
-ENV dbname="postgres"
+ENV dbname="quickkart"
 
 #COPY /Users/rajatkr/GolandProjects/qvickly_new/pg.env /app
 # ... rest of your dockerfile

@@ -47,9 +47,3 @@ func main() {
 		panic(err.Error())
 	}
 }
-
-// TODO | add x-api-key logic to gateways as well
-
-// TODO | a service has to run to mark stores open and close by midnight and morning 7 to auto close and open, shopkeepers can open close at their will too
-
-// TODO | add a carts table and a foreign key of cart_id in order_items table

@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 	"qvickly/database/postgres"
 	"qvickly/models/delivery"
+	"qvickly/models/vendors"
 )
 
 // GetDeliveryPartnerProfile godoc
@@ -22,31 +22,15 @@ import (
 // @Failure 400 {object} delivery.ErrorResponse "Invalid UUID format or missing ID parameter"
 // @Failure 404 {object} delivery.ErrorResponse "Delivery partner not found"
 // @Failure 500 {object} delivery.ErrorResponse "Internal server error"
-// @Router /delivery/profile/details [get]
+// @Router /delivery/profile/details [post]
 func GetDeliveryPartnerProfile(c *gin.Context) {
-	// Get ID from query parameter
-	idParam := c.Query("id")
-	if idParam == "" {
-		c.JSON(http.StatusBadRequest, delivery.ErrorResponse{
-			Error:   "missing_parameter",
-			Message: "ID parameter is required",
-			Code:    400,
-		})
+	var json vendors.ProfileRequestBody
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Validate UUID format
-	partnerID, err := uuid.Parse(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, delivery.ErrorResponse{
-			Error:   "invalid_uuid",
-			Message: "Invalid UUID format for ID parameter",
-			Code:    400,
-		})
-		return
-	}
-
-	data, dob, err := postgres.GetDeliveryPartnerProfileDetails(partnerID)
+	data, dob, err := postgres.GetDeliveryPartnerProfileDetails(json.Phone, json.Password)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

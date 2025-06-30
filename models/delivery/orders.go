@@ -1,6 +1,9 @@
 package delivery
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 // OrdersSummaryResponse represents the delivery partner orders summary
 type OrdersSummaryResponse struct {
@@ -11,7 +14,7 @@ type OrdersSummaryResponse struct {
 
 // RecentOrderResponse represents a recent order for delivery partner
 type RecentOrderResponse struct {
-	ID                    int       `json:"id"`
+	ID                    uuid.UUID `json:"id"`
 	Status                string    `json:"status"`
 	Earnings              float64   `json:"earnings"`
 	LastStatusUpdatedTime time.Time `json:"last_status_updated_time"`
@@ -20,21 +23,21 @@ type RecentOrderResponse struct {
 
 // OrderDetailResponse represents the detailed order information for delivery partner
 type OrderDetailResponse struct {
-	ID                  string            `json:"id"`
-	Status              string            `json:"status"`
-	AcceptedAt          *time.Time        `json:"accepted_at"`
-	DeliveredAt         *time.Time        `json:"delivered_at"`
-	DeliveryFee         float64           `json:"delivery_fee"`
-	Bonus               float64           `json:"bonus"`
-	Earning             float64           `json:"earning"`
-	CustomerName        string            `json:"customer_name"`
-	DeliveryAddress     string            `json:"delivery_address"`
-	DeliveryLatitude    *float64          `json:"delivery_latitude"`
-	DeliveryLongitude   *float64          `json:"delivery_longitude"`
-	DeliveryInstruction *string           `json:"delivery_instruction"`
-	ItemsValue          float64           `json:"items_value"`
-	StoreName           string            `json:"store_name"`
-	Items               []OrderItemDetail `json:"items"`
+	ID                  string      `json:"id"`
+	Status              string      `json:"status"`
+	AcceptedAt          *time.Time  `json:"accepted_at"`
+	DeliveredAt         *time.Time  `json:"delivered_at"`
+	DeliveryFee         float64     `json:"delivery_fee"`
+	Bonus               float64     `json:"bonus"`
+	Earning             float64     `json:"earning"`
+	CustomerName        string      `json:"customer_name"`
+	DeliveryAddress     string      `json:"delivery_address"`
+	DeliveryLatitude    *float64    `json:"delivery_latitude"`
+	DeliveryLongitude   *float64    `json:"delivery_longitude"`
+	DeliveryInstruction *string     `json:"delivery_instruction"`
+	ItemsValue          float64     `json:"items_value"`
+	StoreName           string      `json:"store_name"`
+	Items               []OrderItem `json:"items"`
 }
 
 // OrderItemDetail represents individual item in the order
@@ -43,4 +46,69 @@ type OrderItemDetail struct {
 	Label    string  `json:"label"`
 	Qty      int     `json:"qty"`
 	ImageURL *string `json:"image_url"`
+}
+
+// Extended version with more grocery-specific fields
+type OrderItem struct {
+	// Basic item information
+	ID          uuid.UUID `json:"id" db:"item_id"`
+	Name        string    `json:"name" db:"title"`
+	Description string    `json:"description,omitempty" db:"description"`
+
+	// Quantity and pricing
+	Quantity       int     `json:"quantity" db:"qty"`
+	UnitPrice      float64 `json:"unit_price" db:"price_retail"`
+	WholesalePrice float64 `json:"wholesale_price,omitempty" db:"price_wholesale"`
+	TotalPrice     float64 `json:"total_price" db:"total_price"`
+
+	// Images (multiple image support)
+	ImageURL1 string `json:"image_url_1,omitempty" db:"image_url_1"`
+	ImageURL2 string `json:"image_url_2,omitempty" db:"image_url_2"`
+	ImageURL3 string `json:"image_url_3,omitempty" db:"image_url_3"`
+	ImageURL4 string `json:"image_url_4,omitempty" db:"image_url_4"`
+
+	// Category information
+	CategoryID    int `json:"category_id" db:"category_id"`
+	SubcategoryID int `json:"subcategory_id" db:"subcategory_id"`
+
+	// Additional metadata
+	SearchKeywords string `json:"search_keywords,omitempty" db:"search_keywords"`
+
+	// Timestamps
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+}
+
+// Method to get the primary image URL
+func (oi *OrderItem) GetPrimaryImageURL() string {
+	if oi.ImageURL1 != "" {
+		return oi.ImageURL1
+	}
+	if oi.ImageURL2 != "" {
+		return oi.ImageURL2
+	}
+	if oi.ImageURL3 != "" {
+		return oi.ImageURL3
+	}
+	if oi.ImageURL4 != "" {
+		return oi.ImageURL4
+	}
+	return ""
+}
+
+// Method to get all available image URLs
+func (oi *OrderItem) GetAllImageURLs() []string {
+	var urls []string
+	if oi.ImageURL1 != "" {
+		urls = append(urls, oi.ImageURL1)
+	}
+	if oi.ImageURL2 != "" {
+		urls = append(urls, oi.ImageURL2)
+	}
+	if oi.ImageURL3 != "" {
+		urls = append(urls, oi.ImageURL3)
+	}
+	if oi.ImageURL4 != "" {
+		urls = append(urls, oi.ImageURL4)
+	}
+	return urls
 }

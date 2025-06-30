@@ -13,10 +13,10 @@ import (
 // @Tags vendor-profile
 // @Accept json
 // @Produce json
-// @Param request body vendors.GetVendorProfileRequestBody true "Complete vendor profile information"
+// @Param request body vendors.ProfileRequestBody true "Complete vendor profile information"
 // @Router /vendor/profile/details [post]
 func GetVendorProfileDetails(context *gin.Context) {
-	var json vendors.GetVendorProfileRequestBody
+	var json vendors.ProfileRequestBody
 	if err := context.ShouldBindJSON(&json); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

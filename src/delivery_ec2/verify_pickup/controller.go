@@ -27,10 +27,10 @@ import (
 // @Router /delivery/verify_pickup [post]
 func VerifyPickup(c *gin.Context) {
 	// Get query parameters
-	orderIDParam := c.Query("order_id")
+	vendorAssignmentId := c.Query("vendor_assignment_id")
 	deliveryBoyIDParam := c.Query("delivery_boy_id")
 
-	if orderIDParam == "" || deliveryBoyIDParam == "" {
+	if vendorAssignmentId == "" || deliveryBoyIDParam == "" {
 		c.JSON(http.StatusBadRequest, delivery.PickupErrorResponse{
 			Success: false,
 			Error:   "missing_parameters",
@@ -41,7 +41,7 @@ func VerifyPickup(c *gin.Context) {
 	}
 
 	// Validate and parse order ID
-	orderID, err := strconv.Atoi(orderIDParam)
+	orderID, err := uuid.Parse(vendorAssignmentId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, delivery.PickupErrorResponse{
 			Success: false,

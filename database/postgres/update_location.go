@@ -10,7 +10,7 @@ import (
 )
 
 // ProcessLocationUpdate handles the main location update logic
-func ProcessLocationUpdate(partnerID uuid.UUID, latitude, longitude float64) error {
+func ProcessLocationUpdate(deliveryBoyID uuid.UUID, latitude, longitude float64) error {
 	now := time.Now()
 
 	// Start transaction
@@ -20,23 +20,21 @@ func ProcessLocationUpdate(partnerID uuid.UUID, latitude, longitude float64) err
 	}
 	defer tx.Rollback(context.Background())
 
-	// Update delivery partner location and set online
 	updateQuery := `
-		UPDATE delivery_partners.delivery_partners 
-		SET latitude = $1,
-		    longitude = $2,
-		    online_status = true,
-		    last_location_update = $3,
-		    updated_at = $3
-		WHERE id = $4 AND is_active = true
-		RETURNING name
-	`
+       UPDATE profile.delivery_boy 
+       SET latitude = $1,
+           longitude = $2,
+           is_active = true,
+           updated_at = $3
+       WHERE id = $4 AND is_active = true
+       RETURNING full_name
+    `
 
-	var partnerName string
-	err = tx.QueryRow(context.Background(), updateQuery, latitude, longitude, now, partnerID).Scan(&partnerName)
+	var deliveryBoyName string
+	err = tx.QueryRow(context.Background(), updateQuery, latitude, longitude, now, deliveryBoyID).Scan(&deliveryBoyName)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("partner_not_found")
+			return fmt.Errorf("delivery_boy_not_found")
 		}
 		return err
 	}
