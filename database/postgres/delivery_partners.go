@@ -44,3 +44,10 @@ func GetDeliveryPartnerProfileDetails(phone, password string) (profile delivery.
 
 	return
 }
+
+func UpdateDeliveryPartnerOnlineStatus(deliveryId string, status bool) (err error) {
+	query := `update quickkart.profile.delivery_boy set is_active = $1 where delivery_boy.id = $2`
+
+	_, err = pgPool.Exec(context.Background(), query, status, deliveryId)
+	return
+}
