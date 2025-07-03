@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"qvickly/src/delivery_ec2/delivery_details"
 	"qvickly/src/delivery_ec2/delivery_profile_details"
 	"qvickly/src/delivery_ec2/online_status"
 	order_details2 "qvickly/src/delivery_ec2/order_details"
@@ -64,6 +65,7 @@ func Router(app *gin.Engine) {
 		group.GET("/order/detail", order_details2.GetDeliveryOrderDetail)
 		group.POST("/update_location", update_location.UpdateDeliveryPartnerLocation)
 		group.POST("/update_online_status", online_status.UpdateDeliveryPartnerOnlineStatus)
+		group.POST("/details", delivery_details.GetDeliveryDetails)
 	}
 
 }
