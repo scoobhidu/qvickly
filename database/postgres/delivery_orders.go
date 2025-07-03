@@ -180,7 +180,7 @@ func GetBasicRecentOrders(deliveryBoyID uuid.UUID, limit int, statusFilter strin
 	// Build the query with optional status filter
 	baseQuery := `
 	  SELECT
-		o.order_id,
+		ot.delivery_id,
 		o.status,
 		o.amount,
 		o.updated_at as last_status_updated_time,
