@@ -114,6 +114,15 @@ type OrderItem struct {
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
+// Extended version with more grocery-specific fields
+type OrderItemSummary struct {
+	ID        int     `json:"id" db:"item_id"`
+	Name      string  `json:"name" db:"title"`
+	Quantity  int     `json:"quantity" db:"qty"`
+	Price     float64 `json:"total_price" db:"total_price"`
+	ImageURL1 string  `json:"image_url_1,omitempty" db:"image_url_1"`
+}
+
 // Method to get the primary image URL
 func (oi *OrderItem) GetPrimaryImageURL() string {
 	if oi.ImageURL1 != "" {

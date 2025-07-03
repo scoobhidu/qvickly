@@ -66,6 +66,8 @@ func Router(app *gin.Engine) {
 		group.POST("/update_location", update_location.UpdateDeliveryPartnerLocation)
 		group.POST("/update_online_status", online_status.UpdateDeliveryPartnerOnlineStatus)
 		group.POST("/details", delivery_details.GetDeliveryDetails)
+		group.POST("/vendor/items", delivery_details.GetDeliveryVendorItems)
+		group.POST("/customer/items", delivery_details.GetDeliveryCustomerItems)
 	}
 
 }

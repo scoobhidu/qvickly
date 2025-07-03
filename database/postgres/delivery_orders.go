@@ -405,6 +405,76 @@ func getOrderItems(orderID uuid.UUID) ([]delivery.OrderItem, error) {
 	return items, nil
 }
 
+// Helper function to get order items (also updated for your schema)
+func GetDeliveryVendorItems(assignmentId uuid.UUID) ([]delivery.OrderItemSummary, error) {
+	itemsQuery := `
+       select ot.item_id, ot.qty, gi.title, gi.price_retail, gi.image_url_1 from vendor.order_items ot
+         left join master.grocery_items gi on ot.item_id = gi.item_id
+         where vendor_assignment_id = $1
+    `
+
+	rows, err := pgPool.Query(context.Background(), itemsQuery, assignmentId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []delivery.OrderItemSummary
+
+	for rows.Next() {
+		var item delivery.OrderItemSummary
+
+		err := rows.Scan(
+			&item.ID,
+			&item.Quantity,
+			&item.Name,
+			&item.Price,
+			&item.ImageURL1,
+		)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+// Helper function to get order items (also updated for your schema)
+func GetDeliveryCustomerItems(orderid uuid.UUID) ([]delivery.OrderItemSummary, error) {
+	itemsQuery := `   
+		select ot.item_id, ot.qty, gi.title, gi.price_retail, gi.image_url_1 from customer.order_items ot
+			left join master.grocery_items gi on ot.item_id = gi.item_id
+			where order_id = $1
+    `
+
+	rows, err := pgPool.Query(context.Background(), itemsQuery, orderid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []delivery.OrderItemSummary
+
+	for rows.Next() {
+		var item delivery.OrderItemSummary
+
+		err := rows.Scan(
+			&item.ID,
+			&item.Quantity,
+			&item.Name,
+			&item.Price,
+			&item.ImageURL1,
+		)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
 // calculateBonus calculates bonus based on various factors
 func calculateBonus(deliveryFee float64, status string, acceptedAt time.Time) float64 {
 	bonus := 0.0
