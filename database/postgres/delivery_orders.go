@@ -120,6 +120,7 @@ func GetDeliveryDetails(deliveryBoyID uuid.UUID) ([]delivery.PickupDetail, []del
 	completedQuery = `
 		SELECT 
 			o.order_id,
+			o.pick_up_time,
 			o.deliver_by_time AS delivery_time,
 			concat(ca.city, ', ', ca.state) as address,
 			c.full_name AS customer_name,
@@ -147,6 +148,7 @@ func GetDeliveryDetails(deliveryBoyID uuid.UUID) ([]delivery.PickupDetail, []del
 		var dDetail delivery.DeliveryDetail
 		err := rows.Scan(
 			&dDetail.OrderId,
+			&dDetail.PickUpTime,
 			&dDetail.DeliverByTime,
 			&dDetail.Address,
 			&dDetail.Name,

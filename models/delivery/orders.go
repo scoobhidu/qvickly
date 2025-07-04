@@ -28,7 +28,8 @@ type PickupDetail struct {
 
 type DeliveryDetail struct {
 	OrderId       uuid.UUID `json:"vendor_assignment_id"`
-	DeliverByTime time.Time `json:"pickup_time"`
+	PickUpTime    time.Time `json:"pickup_time"`
+	DeliverByTime time.Time `json:"deliver_by_time"`
 	Status        string    `json:"status"`
 	Address       string    `json:"address"`
 	Name          string    `json:"name"`
