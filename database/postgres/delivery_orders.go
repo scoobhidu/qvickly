@@ -66,7 +66,8 @@ func GetDeliveryDetails(deliveryBoyID uuid.UUID) ([]delivery.PickupDetail, []del
 			o.order_id,
 			vpt.vendor_assignment_id,
 			v.vendor_id,
-			opa.picked_up
+			opa.picked_up,
+			o.order_time
 		FROM
 			delivery.vendor_pickup_tracker vpt
 				JOIN vendor.order_pickup_assignments opa ON vpt.vendor_assignment_id = opa.vendor_assignment_id
@@ -108,6 +109,7 @@ func GetDeliveryDetails(deliveryBoyID uuid.UUID) ([]delivery.PickupDetail, []del
 			&pickupDetail.VendorAssignmentId,
 			&pickupDetail.VendorId,
 			&pickupDetail.PickedUp,
+			&pickupDetail.OrderTime,
 		)
 		if err != nil {
 			return nil, nil, err

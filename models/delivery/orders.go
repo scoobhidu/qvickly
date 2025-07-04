@@ -23,6 +23,7 @@ type PickupDetail struct {
 	Items              int       `json:"items"`
 	Amount             string    `json:"amount"`
 	PickedUp           bool      `json:"picked_up"`
+	OrderTime          time.Time `json:"order_time"`
 }
 
 type DeliveryDetail struct {
