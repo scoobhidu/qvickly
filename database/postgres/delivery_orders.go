@@ -55,124 +55,108 @@ func GetBasicOrdersSummary(deliveryBoyID uuid.UUID) (*delivery.OrdersSummaryResp
 }
 
 // GetDeliveryDetails retrieves basic summary information
-func GetDeliveryDetails(deliveryBoyID uuid.UUID) (*delivery.DeliveryDetailsResponse, error) {
-	var vendor_assignment_id, order_id, customer_id, delivery_id, vendor_id uuid.UUID
-	var order_time, pack_by_time, pick_up_time, deliver_by_time, paid_time, delivery_time sql.NullTime
-	var instructions, status, c_phone, full_name, title, address_line1, address_line2,
-		city, state, postal_code, country, account_type, business_name, owner_name, v_phone, address string
-
-	var amount, c_latitude, c_longitude, v_latitude, v_longitude float64
-
+func GetDeliveryDetails(deliveryBoyID uuid.UUID) ([]delivery.PickupDetail, []delivery.DeliveryDetail, error) {
 	completedQuery := `
-     select
-    opa.vendor_assignment_id,
-    opa.vendor_id,
-    opa.order_id,
-    ca.customer_id,
-    o.order_time,
-    o.pack_by_time,
-    o.pick_up_time,
-    o.deliver_by_time,
-    o.paid_time,
-    o.delivery_time,
-    o.instructions,
-    o.amount,
-    o.status,
-    ot.delivery_id,
-    c.phone,
-    c.full_name,
-    ca.title,
-    ca.address_line1,
-    ca.address_line2,
-    ca.city,
-    ca.state,
-    ca.postal_code,
-    ca.country,
-    ca.latitude,
-    ca.longitude,
-    v.account_type,
-    v.business_name,
-    v.owner_name,
-    v.phone,
-    v.address,
-    v.latitude,
-    v.longitude
-    from vendor.order_pickup_assignments opa
-    left join customer.orders o on opa.order_id = o.order_id
-    left join delivery.order_tracker ot on o.order_id = ot.order_id
-    left join delivery.vendor_pickup_tracker vpt on ot.delivery_id = vpt.delivery_id
-    left join profile.customer c on o.customer_id = c.id
-    left join profile.customer_addresses ca on c.id = ca.customer_id
-    left join profile.vendors v on opa.vendor_id = v.vendor_id
-
-    where ot.delivery_id = $1::uuid; 
+		SELECT
+			v.business_name AS vendor_name,
+			o.pick_up_time AS pickup_time,
+			v.address,
+			COUNT(oi.item_id) AS total_items,
+			CONCAT('₹', SUM(gi.price_retail * oi.qty)) AS total_amount,
+			o.order_id,
+			vpt.vendor_assignment_id,
+			v.vendor_id,
+			opa.picked_up
+		FROM
+			delivery.vendor_pickup_tracker vpt
+				JOIN vendor.order_pickup_assignments opa ON vpt.vendor_assignment_id = opa.vendor_assignment_id
+				JOIN profile.vendors v ON opa.vendor_id = v.vendor_id
+				JOIN customer.orders o ON opa.order_id = o.order_id
+				JOIN customer.order_items oi ON o.order_id = oi.order_id
+				JOIN master.grocery_items gi ON gi.item_id = oi.item_id
+		WHERE
+			vpt.delivery_id = $1
+		GROUP BY
+			v.vendor_id,
+			vpt.vendor_assignment_id,
+			vpt.delivery_id,
+			v.business_name,
+			o.pick_up_time,
+			o.order_id,
+			vpt.delivery_id,
+			opa.picked_up
+		ORDER BY
+			o.pick_up_time ASC; 
     `
 
-	err := pgPool.QueryRow(context.Background(), completedQuery, deliveryBoyID).Scan(
-		&vendor_assignment_id, &vendor_id, &order_id, &customer_id, &order_time, &pack_by_time, &pick_up_time,
-		&deliver_by_time, &paid_time, &delivery_time, &instructions, &amount, &status, &delivery_id, &c_phone,
-		&full_name, &title, &address_line1, &address_line2, &city, &state, &postal_code, &country, &c_latitude,
-		&c_longitude, &account_type, &business_name, &owner_name, &v_phone, &address, &v_latitude,
-		&v_longitude,
-	)
+	rows, err := pgPool.Query(context.Background(), completedQuery, deliveryBoyID)
 	if err != nil {
-		return nil, err
-	}
-	var orT, paT, piT, deliverByT, paidT, deliveryT time.Time
-
-	if order_time.Valid {
-		orT = order_time.Time
-	}
-	if pack_by_time.Valid {
-		paT = pack_by_time.Time
-	}
-	if pick_up_time.Valid {
-		piT = pick_up_time.Time
-	}
-	if deliver_by_time.Valid {
-		deliverByT = deliver_by_time.Time
-	}
-	if paid_time.Valid {
-		paT = paid_time.Time
-	}
-	if delivery_time.Valid {
-		deliveryT = delivery_time.Time
+		return nil, nil, err
 	}
 
-	return &delivery.DeliveryDetailsResponse{
-		VendorAssignmentId: vendor_assignment_id,
-		VendorId:           vendor_id,
-		OrderId:            order_id,
-		CustomerId:         customer_id,
-		DeliveryId:         delivery_id,
-		OrderTime:          &orT,
-		PackByTime:         &paT,
-		PickUpTime:         &piT,
-		DeliverByTime:      &deliverByT,
-		PaidTime:           &paidT,
-		DeliveryTime:       &deliveryT,
-		Instructions:       instructions,
-		Amount:             amount,
-		Status:             status,
-		Phone:              c_phone,
-		CustomerName:       full_name,
-		Title:              title,
-		Address1:           address_line1,
-		Address2:           address_line2,
-		City:               city,
-		State:              state,
-		PostalCode:         postal_code,
-		Country:            country,
-		CLatitude:          c_latitude,
-		CLongitude:         c_longitude,
-		VendorType:         account_type,
-		BusinessName:       business_name,
-		OwnerName:          owner_name,
-		VPhone:             v_phone,
-		VAddress:           address,
-		VLatitude:          v_latitude,
-		VLongitude:         v_longitude,
-	}, nil
+	var details []delivery.PickupDetail
+
+	for rows.Next() {
+		var pickupDetail delivery.PickupDetail
+		err := rows.Scan(
+			&pickupDetail.Name,
+			&pickupDetail.PickupTime,
+			&pickupDetail.Address,
+			&pickupDetail.Items,
+			&pickupDetail.Amount,
+			&pickupDetail.OrderId,
+			&pickupDetail.VendorAssignmentId,
+			&pickupDetail.VendorId,
+			&pickupDetail.PickedUp,
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+		details = append(details, pickupDetail)
+	}
+
+	completedQuery = `
+		SELECT 
+			o.order_id,
+			o.deliver_by_time AS delivery_time,
+			concat(ca.city, ', ', ca.state) as address,
+			c.full_name AS customer_name,
+			o.status
+		FROM 
+			delivery.order_tracker ot
+			JOIN customer.orders o ON ot.order_id = o.order_id
+			JOIN profile.customer c ON o.customer_id = c.id
+			JOIN profile.customer_addresses ca ON o.customer_id = ca.customer_id AND ca.is_default = true
+		WHERE 
+			ot.delivery_id = $1
+		ORDER BY 
+			o.deliver_by_time ASC, 
+			o.order_id ASC;
+	`
+
+	rows, err = pgPool.Query(context.Background(), completedQuery, deliveryBoyID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var dDetails []delivery.DeliveryDetail
+
+	for rows.Next() {
+		var dDetail delivery.DeliveryDetail
+		err := rows.Scan(
+			&dDetail.OrderId,
+			&dDetail.DeliverByTime,
+			&dDetail.Address,
+			&dDetail.Name,
+			&dDetail.Status,
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+		dDetails = append(dDetails, dDetail)
+	}
+
+	return details, dDetails, nil
 }
 
 // GetBasicRecentOrders retrieves basic recent orders information

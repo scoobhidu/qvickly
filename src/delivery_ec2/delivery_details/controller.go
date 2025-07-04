@@ -43,7 +43,7 @@ func GetDeliveryDetails(c *gin.Context) {
 		return
 	}
 
-	response, err := postgres.GetDeliveryDetails(deliveryID)
+	res, res1, err := postgres.GetDeliveryDetails(deliveryID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, delivery.ErrorResponse{
 			Error:   "database_error",
@@ -52,7 +52,11 @@ func GetDeliveryDetails(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, response)
+
+	c.JSON(http.StatusOK, gin.H{
+		"vendor_details":   res,
+		"delivery_details": res1,
+	})
 }
 
 // GetDeliveryVendorItems godoc

@@ -12,40 +12,25 @@ type OrdersSummaryResponse struct {
 	ActiveOrders int     `json:"active_orders"`
 }
 
-// DeliveryDetailsResponse represents the delivery partner orders summary
-type DeliveryDetailsResponse struct {
-	VendorAssignmentId uuid.UUID  `json:"vendor_assignment_id"`
-	VendorId           uuid.UUID  `json:"vendor_id"`
-	OrderId            uuid.UUID  `json:"order_id"`
-	CustomerId         uuid.UUID  `json:"customer_id"`
-	DeliveryId         uuid.UUID  `json:"delivery_id"`
-	OrderTime          *time.Time `json:"order_time"`
-	PackByTime         *time.Time `json:"pack_by_time"`
-	PickUpTime         *time.Time `json:"pick_up_time"`
-	DeliverByTime      *time.Time `json:"deliver_by_time"`
-	PaidTime           *time.Time `json:"paid_time"`
-	DeliveryTime       *time.Time `json:"delivery_time"`
-	Instructions       string     `json:"instructions"`
-	Amount             float64    `json:"amount"`
-	Status             string     `json:"status"`
-	Phone              string     `json:"phone"`
-	CustomerName       string     `json:"customer_name"`
-	Title              string     `json:"title"`
-	Address1           string     `json:"address_1"`
-	Address2           string     `json:"address_2"`
-	City               string     `json:"city"`
-	State              string     `json:"state"`
-	PostalCode         string     `json:"postal_code"`
-	Country            string     `json:"country"`
-	CLatitude          float64    `json:"c_latitude"`
-	CLongitude         float64    `json:"c_longitude"`
-	VendorType         string     `json:"vendor_type"`
-	BusinessName       string     `json:"business_name"`
-	OwnerName          string     `json:"owner_name"`
-	VPhone             string     `json:"v_phone"`
-	VAddress           string     `json:"v_address"`
-	VLatitude          float64    `json:"v_latitude"`
-	VLongitude         float64    `json:"v_longitude"`
+type PickupDetail struct {
+	VendorAssignmentId uuid.UUID `json:"vendor_assignment_id"`
+	VendorId           uuid.UUID `json:"vendor_id"`
+	OrderId            uuid.UUID `json:"order_id"`
+	Status             string    `json:"status"`
+	PickupTime         time.Time `json:"pickup_time"`
+	Address            string    `json:"address"`
+	Name               string    `json:"name"`
+	Items              int       `json:"items"`
+	Amount             string    `json:"amount"`
+	PickedUp           bool      `json:"picked_up"`
+}
+
+type DeliveryDetail struct {
+	OrderId       uuid.UUID `json:"vendor_assignment_id"`
+	DeliverByTime time.Time `json:"pickup_time"`
+	Status        string    `json:"status"`
+	Address       string    `json:"address"`
+	Name          string    `json:"name"`
 }
 
 // RecentOrderResponse represents a recent order for delivery partner
