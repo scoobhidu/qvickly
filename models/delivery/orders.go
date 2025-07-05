@@ -73,32 +73,21 @@ type OrderItemDetail struct {
 
 // Extended version with more grocery-specific fields
 type OrderItem struct {
-	// Basic item information
-	ID          uuid.UUID `json:"id" db:"item_id"`
-	Name        string    `json:"name" db:"title"`
-	Description string    `json:"description,omitempty" db:"description"`
-
-	// Quantity and pricing
-	Quantity       int     `json:"quantity" db:"qty"`
-	UnitPrice      float64 `json:"unit_price" db:"price_retail"`
-	WholesalePrice float64 `json:"wholesale_price,omitempty" db:"price_wholesale"`
-	TotalPrice     float64 `json:"total_price" db:"total_price"`
-
-	// Images (multiple image support)
-	ImageURL1 string `json:"image_url_1,omitempty" db:"image_url_1"`
-	ImageURL2 string `json:"image_url_2,omitempty" db:"image_url_2"`
-	ImageURL3 string `json:"image_url_3,omitempty" db:"image_url_3"`
-	ImageURL4 string `json:"image_url_4,omitempty" db:"image_url_4"`
-
-	// Category information
-	CategoryID    int `json:"category_id" db:"category_id"`
-	SubcategoryID int `json:"subcategory_id" db:"subcategory_id"`
-
-	// Additional metadata
-	SearchKeywords string `json:"search_keywords,omitempty" db:"search_keywords"`
-
-	// Timestamps
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	ID             uuid.UUID `json:"id" db:"item_id"`
+	Name           string    `json:"name" db:"title"`
+	Description    string    `json:"description,omitempty" db:"description"`
+	Quantity       int       `json:"quantity" db:"qty"`
+	UnitPrice      float64   `json:"unit_price" db:"price_retail"`
+	WholesalePrice float64   `json:"wholesale_price,omitempty" db:"price_wholesale"`
+	TotalPrice     float64   `json:"total_price" db:"total_price"`
+	ImageURL1      string    `json:"image_url_1,omitempty" db:"image_url_1"`
+	ImageURL2      string    `json:"image_url_2,omitempty" db:"image_url_2"`
+	ImageURL3      string    `json:"image_url_3,omitempty" db:"image_url_3"`
+	ImageURL4      string    `json:"image_url_4,omitempty" db:"image_url_4"`
+	CategoryID     int       `json:"category_id" db:"category_id"`
+	SubcategoryID  int       `json:"subcategory_id" db:"subcategory_id"`
+	SearchKeywords string    `json:"search_keywords,omitempty" db:"search_keywords"`
+	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 }
 
 // Extended version with more grocery-specific fields
@@ -108,6 +97,17 @@ type OrderItemSummary struct {
 	Quantity  int     `json:"quantity" db:"qty"`
 	Price     float64 `json:"total_price" db:"total_price"`
 	ImageURL1 string  `json:"image_url_1,omitempty" db:"image_url_1"`
+}
+
+// Extended version with more grocery-specific fields
+type PickupSummary struct {
+	Latitude     float64   `json:"latitude"`
+	Longitude    float64   `json:"longitude"`
+	Address      string    `json:"address"`
+	Phone        string    `json:"phone"`
+	OwnerName    string    `json:"owner_name"`
+	BusinessName string    `json:"business_name"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 // Method to get the primary image URL

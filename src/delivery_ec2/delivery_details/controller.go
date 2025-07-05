@@ -94,7 +94,7 @@ func GetDeliveryVendorItems(c *gin.Context) {
 		return
 	}
 
-	response, err := postgres.GetDeliveryVendorItems(vendorAssignmentId)
+	response, summary, err := postgres.GetDeliveryVendorItems(vendorAssignmentId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, delivery.ErrorResponse{
 			Error:   "database_error",
@@ -103,7 +103,11 @@ func GetDeliveryVendorItems(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, gin.H{
+		"summary": summary,
+		"items":   response,
+		"success": true,
+	})
 }
 
 // GetDeliveryCustomerItems godoc
