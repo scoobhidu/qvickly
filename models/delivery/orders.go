@@ -110,6 +110,20 @@ type PickupSummary struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+type OrderSummary struct {
+	OrderTime     time.Time `json:"order_time"`
+	DeliverByTime time.Time `json:"deliver_by_time"`
+	DeliveryTime  time.Time `json:"delivery_time"`
+	Latitude      float64   `json:"latitude"`
+	Longitude     float64   `json:"longitude"`
+	Amount        float64   `json:"amount"`
+	Instructions  string    `json:"instructions"`
+	Status        string    `json:"status"`
+	Phone         string    `json:"phone"`
+	FullName      string    `json:"full_name"`
+	Address       string    `json:"address"`
+}
+
 // Method to get the primary image URL
 func (oi *OrderItem) GetPrimaryImageURL() string {
 	if oi.ImageURL1 != "" {

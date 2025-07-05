@@ -448,16 +448,43 @@ func GetDeliveryVendorItems(assignmentId uuid.UUID) ([]delivery.OrderItemSummary
 }
 
 // Helper function to get order items (also updated for your schema)
-func GetDeliveryCustomerItems(orderid uuid.UUID) ([]delivery.OrderItemSummary, error) {
+func GetDeliveryCustomerItems(orderid uuid.UUID) ([]delivery.OrderItemSummary, delivery.OrderSummary, error) {
 	itemsQuery := `   
 		select ot.item_id, ot.qty, gi.title, gi.price_retail, gi.image_url_1 from customer.order_items ot
 			left join master.grocery_items gi on ot.item_id = gi.item_id
 			where order_id = $1
     `
 
+	profileQuery := `
+		select order_time, deliver_by_time, delivery_time, instructions,
+			   amount, status, phone, full_name, concat(address_line1, address_line2, postal_code), 
+			   latitude, longitude from customer.orders
+			left join profile.customer c on orders.customer_id = c.id
+			left join profile.customer_addresses ca on c.id = ca.customer_id
+        	where order_id = $1
+    `
+
+	var summary delivery.OrderSummary
+	err := pgPool.QueryRow(context.Background(), profileQuery, orderid).Scan(
+		&summary.OrderTime,
+		&summary.DeliverByTime,
+		&summary.DeliveryTime,
+		&summary.Instructions,
+		&summary.Amount,
+		&summary.Status,
+		&summary.Phone,
+		&summary.FullName,
+		&summary.Address,
+		&summary.Latitude,
+		&summary.Longitude,
+	)
+	if err != nil {
+		return nil, delivery.OrderSummary{}, err
+	}
+
 	rows, err := pgPool.Query(context.Background(), itemsQuery, orderid)
 	if err != nil {
-		return nil, err
+		return nil, summary, err
 	}
 	defer rows.Close()
 
@@ -474,12 +501,12 @@ func GetDeliveryCustomerItems(orderid uuid.UUID) ([]delivery.OrderItemSummary, e
 			&item.ImageURL1,
 		)
 		if err != nil {
-			return nil, err
+			return nil, summary, err
 		}
 		items = append(items, item)
 	}
 
-	return items, nil
+	return items, summary, nil
 }
 
 // calculateBonus calculates bonus based on various factors
