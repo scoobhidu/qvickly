@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"qvickly/database/postgres"
 	"qvickly/models/delivery"
-	"strconv"
 )
 
 // VerifyPickup godoc
@@ -41,7 +40,7 @@ func VerifyPickup(c *gin.Context) {
 	}
 
 	// Validate and parse order ID
-	orderID, err := uuid.Parse(vendorAssignmentId)
+	vendorAssignmentUUID, err := uuid.Parse(vendorAssignmentId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, delivery.PickupErrorResponse{
 			Success: false,
@@ -88,7 +87,7 @@ func VerifyPickup(c *gin.Context) {
 	}
 
 	// Verify pickup
-	response, err := postgres.ProcessPickupVerification(orderID, deliveryPartnerID, request.Pin)
+	response, err := postgres.ProcessPickupVerification(vendorAssignmentUUID, deliveryPartnerID, request.Pin)
 	if err != nil {
 		// Handle different types of errors
 		switch err.Error() {
@@ -98,7 +97,7 @@ func VerifyPickup(c *gin.Context) {
 				Error:   "order_not_found",
 				Message: "Order not found or not assigned to this delivery partner",
 				Code:    404,
-				OrderID: &orderID,
+				OrderID: vendorAssignmentUUID,
 			})
 		case "wrong_pin":
 			c.JSON(http.StatusBadRequest, delivery.PickupErrorResponse{
@@ -106,17 +105,17 @@ func VerifyPickup(c *gin.Context) {
 				Error:   "wrong_pin",
 				Message: "Incorrect pickup PIN. Please verify with vendor",
 				Code:    400,
-				OrderID: &orderID,
+				OrderID: vendorAssignmentUUID,
 			})
 		case "invalid_status":
 			// Get current status for error response
-			currentStatus := postgres.GetCurrentOrderStatus(orderID)
+			currentStatus := postgres.GetCurrentOrderStatus(vendorAssignmentUUID)
 			c.JSON(http.StatusConflict, delivery.PickupErrorResponse{
 				Success:       false,
 				Error:         "invalid_status",
 				Message:       "Order is not ready for pickup. Current status: " + currentStatus,
 				Code:          409,
-				OrderID:       &orderID,
+				OrderID:       vendorAssignmentUUID,
 				CurrentStatus: &currentStatus,
 			})
 		case "already_picked_up":
@@ -125,7 +124,7 @@ func VerifyPickup(c *gin.Context) {
 				Error:   "already_picked_up",
 				Message: "Order has already been picked up",
 				Code:    409,
-				OrderID: &orderID,
+				OrderID: vendorAssignmentUUID,
 			})
 		default:
 			c.JSON(http.StatusInternalServerError, delivery.PickupErrorResponse{
@@ -133,7 +132,7 @@ func VerifyPickup(c *gin.Context) {
 				Error:   "internal_error",
 				Message: "Failed to verify pickup",
 				Code:    500,
-				OrderID: &orderID,
+				OrderID: vendorAssignmentUUID,
 			})
 		}
 		return

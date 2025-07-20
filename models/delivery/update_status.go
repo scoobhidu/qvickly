@@ -1,6 +1,9 @@
 package delivery
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 // VerifyPickupRequest represents the pickup verification request
 type VerifyPickupRequest struct {
@@ -11,7 +14,7 @@ type VerifyPickupRequest struct {
 type VerifyPickupResponse struct {
 	Success         bool      `json:"success"`
 	Message         string    `json:"message"`
-	OrderID         int       `json:"order_id"`
+	OrderID         uuid.UUID `json:"order_id"`
 	NewStatus       string    `json:"new_status"`
 	VerifiedAt      time.Time `json:"verified_at"`
 	DeliveryPartner string    `json:"delivery_partner"`
@@ -22,10 +25,10 @@ type VerifyPickupResponse struct {
 
 // PickupErrorResponse represents pickup verification error
 type PickupErrorResponse struct {
-	Success       bool    `json:"success"`
-	Error         string  `json:"error"`
-	Message       string  `json:"message"`
-	Code          int     `json:"code"`
-	OrderID       *int    `json:"order_id,omitempty"`
-	CurrentStatus *string `json:"current_status,omitempty"`
+	Success       bool      `json:"success"`
+	Error         string    `json:"error"`
+	Message       string    `json:"message"`
+	Code          int       `json:"code"`
+	OrderID       uuid.UUID `json:"order_id,omitempty"`
+	CurrentStatus *string   `json:"current_status,omitempty"`
 }

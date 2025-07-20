@@ -62,6 +62,7 @@ func Router(app *gin.Engine) {
 		group.POST("/profile/details", delivery_profile_details.GetDeliveryPartnerProfile)
 		group.GET("/profile/orders/summary", orders_summary.GetDeliveryPartnerOrdersSummary)
 		group.GET("/orders/recent", recentorders2.GetDeliveryPartnerRecentOrders)
+		group.GET("/orders/all", recentorders2.GetDeliveryPartnerAllOrders)
 		group.GET("/order/detail", order_details2.GetDeliveryOrderDetail)
 		group.POST("/update_location", update_location.UpdateDeliveryPartnerLocation)
 		group.POST("/update_online_status", online_status.UpdateDeliveryPartnerOnlineStatus)

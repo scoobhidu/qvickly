@@ -10,7 +10,7 @@ import (
 )
 
 // ProcessPickupVerification handles the main pickup verification logic
-func ProcessPickupVerification(orderID int, deliveryPartnerID uuid.UUID, providedPin int) (*delivery.VerifyPickupResponse, error) {
+func ProcessPickupVerification(orderID uuid.UUID, deliveryPartnerID uuid.UUID, providedPin int) (*delivery.VerifyPickupResponse, error) {
 	// Start database transaction
 	tx, err := pgPool.Begin(context.Background())
 	if err != nil {
@@ -147,7 +147,7 @@ func ProcessPickupVerification(orderID int, deliveryPartnerID uuid.UUID, provide
 }
 
 // GetCurrentOrderStatus gets the current status of an order for error responses
-func GetCurrentOrderStatus(orderID int) string {
+func GetCurrentOrderStatus(orderID uuid.UUID) string {
 	var status string
 	query := `SELECT status FROM orders.orders WHERE id = $1`
 

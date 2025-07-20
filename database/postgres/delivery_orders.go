@@ -226,6 +226,66 @@ func GetBasicRecentOrders(deliveryBoyID uuid.UUID, limit int, statusFilter strin
 	return orders, nil
 }
 
+// GetBasicRecentOrders retrieves basic recent orders information
+func GetBasicAllOrders(deliveryBoyID uuid.UUID, statusFilter string) ([]delivery.RecentOrderResponse, error) {
+	// Build the query with optional status filter
+	baseQuery := `
+	  SELECT
+		ot.delivery_id,
+		o.status,
+		o.amount,
+		o.updated_at as last_status_updated_time,
+		(SELECT COUNT(*)
+		 FROM customer.order_items oi
+		 WHERE oi.order_id = o.order_id) as items_count
+		FROM customer.orders o
+				 left JOIN delivery.order_tracker ot ON o.order_id = ot.order_id
+		WHERE ot.delivery_boy_id = $1 
+    `
+
+	var args []interface{}
+	argIndex := 2
+
+	args = append(args, deliveryBoyID)
+
+	// Add status filter if provided
+	if statusFilter != "" {
+		baseQuery += " AND o.status = $" + strconv.Itoa(argIndex)
+		args = append(args, statusFilter)
+		argIndex++
+	}
+
+	// Add ordering and limit
+	baseQuery += `ORDER BY o.order_time DESC `
+
+	rows, err := pgPool.Query(context.Background(), baseQuery, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []delivery.RecentOrderResponse
+
+	for rows.Next() {
+		var order delivery.RecentOrderResponse
+
+		err := rows.Scan(
+			&order.ID,
+			&order.Status,
+			&order.Earnings,
+			&order.LastStatusUpdatedTime,
+			&order.Items,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
+
 // GetOrderDetail retrieves comprehensive order details for delivery partner
 func GetOrderDetail(orderID uuid.UUID, deliveryBoyID uuid.UUID) (*delivery.OrderDetailResponse, error) {
 	// Main order query with all required details
