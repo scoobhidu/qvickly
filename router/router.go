@@ -11,6 +11,7 @@ import (
 	"qvickly/src/delivery_ec2/orders_summary"
 	recentorders2 "qvickly/src/delivery_ec2/recent_orders"
 	"qvickly/src/delivery_ec2/update_location"
+	"qvickly/src/user_ec2"
 	"qvickly/src/vendor_ec2/add_item_to_inventory"
 	add_item_to_inventory2 "qvickly/src/vendor_ec2/get_item_categories"
 	"qvickly/src/vendor_ec2/inventory_items"
@@ -69,6 +70,16 @@ func Router(app *gin.Engine) {
 		group.POST("/details", delivery_details.GetDeliveryDetails)
 		group.POST("/vendor/items", delivery_details.GetDeliveryVendorItems)
 		group.POST("/customer/items", delivery_details.GetDeliveryCustomerItems)
+	}
+
+	{
+		group := app.Group("/user")
+
+		group.GET("/categories/items", user_ec2.GetCategoriesWithItems)
+		group.GET("/categories/subcategories", user_ec2.GetCategoriesWithSubcategories)
+		group.GET("/dashboard_nudges", user_ec2.GetDashboardNudges)
+		group.GET("/subcategories/items", user_ec2.GetItemsByCategory)
+		group.GET("/subcategories/items/filter", user_ec2.GetItemsByFilter)
 	}
 
 }
