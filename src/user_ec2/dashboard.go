@@ -34,7 +34,7 @@ func GetDashboardNudges(c *gin.Context) {
 
 // Optional: Get items by category ID with pagination
 func GetItemsByCategory(c *gin.Context) {
-	categoryIDStr := c.Param("subcategory_id")
+	categoryIDStr := c.DefaultQuery("subcategory_id", "1")
 	categoryID, err := strconv.Atoi(categoryIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
@@ -58,7 +58,7 @@ func GetItemsByCategory(c *gin.Context) {
 
 // Optional: Get items by category ID with pagination
 func GetItemsByFilter(c *gin.Context) {
-	categoryIDStr := c.Param("subcategory_id")
+	categoryIDStr := c.DefaultQuery("subcategory_id", "1")
 	categoryID, err := strconv.Atoi(categoryIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})

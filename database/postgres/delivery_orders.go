@@ -69,7 +69,7 @@ func GetDeliveryDetails(deliveryBoyID uuid.UUID) ([]delivery.PickupDetail, []del
 			opa.picked_up,
 			o.order_time
 		FROM
-			delivery.vendor_pickup_tracker vpt
+			delivery.order_tracker vpt
 				JOIN vendor.order_pickup_assignments opa ON vpt.vendor_assignment_id = opa.vendor_assignment_id
 				JOIN profile.vendors v ON opa.vendor_id = v.vendor_id
 				JOIN customer.orders o ON opa.order_id = o.order_id
