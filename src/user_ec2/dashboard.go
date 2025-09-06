@@ -74,13 +74,13 @@ func GetItemsByFilter(c *gin.Context) {
 
 	searchQuery := c.DefaultQuery("search", "")
 
-	minPrice := 0
-	maxPrice := 0
+	minPrice := -1
+	maxPrice := -1
 
 	if minP != "def" {
 		minPrice, _ = strconv.Atoi(minP)
 	}
-	if maxP == "def" {
+	if maxP != "def" {
 		maxPrice, _ = strconv.Atoi(maxP)
 	}
 
