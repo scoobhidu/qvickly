@@ -124,7 +124,7 @@ func GetNudges() []user.DashboardNudge {
 
 func GetItemsBySubCategory(c *gin.Context, err error, categoryID int, limit int, offset int) ([]user.GroceryItem, bool) {
 	rows, err := pgPool.Query(context.Background(), `
-		SELECT item_id, title, description, price_wholesale, price_retail, COALESCE(image_url_1, '') as image_url_1 
+		SELECT item_id, title, description, price_wholesale, price_retail, mrp, COALESCE(image_url_1, '') as image_url_1 
 		FROM quickkart.master.grocery_items 
 		WHERE subcategory_id = $1 
 		ORDER BY title 
@@ -137,7 +137,7 @@ func GetItemsBySubCategory(c *gin.Context, err error, categoryID int, limit int,
 	var items []user.GroceryItem
 	for rows.Next() {
 		var item user.GroceryItem
-		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.ImageURL1)
+		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.Mrp, &item.ImageURL1)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan item"})
 			return make([]user.GroceryItem, 0), true
@@ -149,7 +149,7 @@ func GetItemsBySubCategory(c *gin.Context, err error, categoryID int, limit int,
 
 func GetItemsByFilter(categoryID int, minPrice, maxPrice int, searchQuery string, limit int, offset int) ([]user.GroceryItem, bool) {
 	// Build dynamic query based on filters
-	query := `SELECT item_id, title, description, price_wholesale, price_retail, COALESCE(image_url_1, '') as image_url_1 
+	query := `SELECT item_id, title, description, price_wholesale, price_retail, mrp, COALESCE(image_url_1, '') as image_url_1 
              FROM quickkart.master.grocery_items 
              WHERE subcategory_id = $1`
 
@@ -195,7 +195,7 @@ func GetItemsByFilter(categoryID int, minPrice, maxPrice int, searchQuery string
 	var items []user.GroceryItem
 	for rows.Next() {
 		var item user.GroceryItem
-		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.ImageURL1)
+		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.Mrp, &item.ImageURL1)
 		if err != nil {
 			return make([]user.GroceryItem, 0), true
 		}

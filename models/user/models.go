@@ -20,6 +20,7 @@ type GroceryItem struct {
 	Title          string  `json:"name"`
 	Description    string  `json:"description"`
 	PriceRetail    float64 `json:"price_retail"`
+	Mrp            float64 `json:"mrp"`
 	PriceWholesale float64 `json:"price_wholesale"`
 	ImageURL1      string  `json:"image_url_1"`
 }
