@@ -1,9 +1,6 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"qvickly/src/delivery_ec2/delivery_details"
 	"qvickly/src/delivery_ec2/delivery_profile_details"
 	"qvickly/src/delivery_ec2/online_status"
@@ -25,6 +22,10 @@ import (
 	vendororders "qvickly/src/vendor_ec2/summary"
 	"qvickly/src/vendor_ec2/update_inventory"
 	"qvickly/src/vendor_ec2/update_order_status"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Router(app *gin.Engine) {
@@ -80,6 +81,7 @@ func Router(app *gin.Engine) {
 		group.GET("/dashboard_nudges", user_ec2.GetDashboardNudges)
 		group.GET("/subcategories/items", user_ec2.GetItemsByCategory)
 		group.GET("/subcategories/items/filter", user_ec2.GetItemsByFilter)
+		group.POST("/place_order", user_ec2.PlaceOrder)
 	}
 
 }
