@@ -295,7 +295,7 @@ alter table vendor.order_items
     owner to postgres;
 
 -- Vendor pickup tracker (child of order_tracker and order_pickup_assignments)
-create table if not exists vendor.vendor_pickup_tracker
+create table if not exists vendor.order_tracker
 (
     delivery_id          uuid not null
         references customer.order_tracker,
@@ -306,7 +306,7 @@ create table if not exists vendor.vendor_pickup_tracker
     primary key (delivery_id, vendor_assignment_id)
 );
 
-alter table vendor.vendor_pickup_tracker
+alter table vendor.order_tracker
     owner to postgres;
 
 create table if not exists delivery.order_tracker
@@ -323,7 +323,7 @@ create table if not exists delivery.order_tracker
 alter table delivery.order_tracker
     owner to postgres;
 
-create table if not exists delivery.vendor_pickup_tracker
+create table if not exists delivery.order_tracker
 (
     delivery_id          uuid not null
         references delivery.order_tracker,
@@ -334,7 +334,7 @@ create table if not exists delivery.vendor_pickup_tracker
     primary key (delivery_id, vendor_assignment_id)
 );
 
-alter table delivery.vendor_pickup_tracker
+alter table delivery.order_tracker
     owner to postgres;
 
 
@@ -389,6 +389,6 @@ VALUES ('b001cd89-d713-4c26-af01-87b07611792e'::uuid, 'b2a4f55a-b5b2-47b4-b3a5-4
 INSERT INTO delivery.order_tracker (order_id)
 VALUES ('b2a4f55a-b5b2-47b4-b3a5-4a68583aed2b'::uuid);
 
--- 14. Insert into vendor_pickup_tracker (depends on delivery_boy and vendor_assignment)
-INSERT INTO delivery.vendor_pickup_tracker (delivery_id, vendor_assignment_id)
+-- 14. Insert into order_tracker (depends on delivery_boy and vendor_assignment)
+INSERT INTO delivery.order_tracker (delivery_id, vendor_assignment_id)
 VALUES ('0eb2156d-57c7-4723-89f5-c54295683891'::uuid, '333e7532-dc80-4725-9c63-ed6ac2b2ee23'::uuid);

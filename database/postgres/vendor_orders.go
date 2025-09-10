@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"qvickly/models/vendors"
@@ -11,50 +10,58 @@ import (
 
 func GetVendorTodaysOrderSummary(vendorId string) (orderSummary *vendors.TodayOrderSummary, err error) {
 	orderSummary = new(vendors.TodayOrderSummary)
-	rows, err := pgPool.Query(context.Background(), `select distinct(status), count(*) from postgres.orders.orders where Date(created_at) = CURRENT_DATE and account_id=$1 group by status`, vendorId)
+
+	// Query to get order counts by status for today's orders assigned to this vendor
+	query := `
+        SELECT o.status, COUNT(*) 
+        FROM quickkart.customer.orders o
+        INNER JOIN quickkart.vendor.order_pickup_assignments opa ON o.order_id = opa.order_id
+        WHERE DATE(o.order_time) = CURRENT_DATE 
+        AND opa.vendor_id = $1::uuid
+        GROUP BY o.status`
+
+	rows, err := pgPool.Query(context.Background(), query, vendorId)
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
-	if errors.Is(err, pgx.ErrNoRows) {
-		orderSummary = nil
-	} else if err == nil {
-		for rows.Next() {
-			var status string
-			var count int
-			if err := rows.Scan(&status, &count); err != nil {
-				return nil, err
-			} else {
-				switch status {
-				case "pending":
-					orderSummary.Pending = count
-					break
-				case "accepted":
-					orderSummary.Accepted = count
-					break
-				case "packed":
-					orderSummary.Packed = count
-					break
-				case "ready":
-					orderSummary.Ready = count
-					break
-				case "completed":
-					orderSummary.Completed = count
-					break
-				case "cancelled":
-					orderSummary.Cancelled = count
-					break
-				case "rejected":
-					orderSummary.Rejected = count
-					break
-				default:
-					break
-				}
-			}
-		}
-		if err := rows.Err(); err != nil { // Add this check!
+
+	// Process the results
+	for rows.Next() {
+		var status string
+		var count int
+		if err := rows.Scan(&status, &count); err != nil {
 			return nil, err
+		}
+
+		// Map status counts to the summary struct
+		switch status {
+		case "pending":
+			orderSummary.Pending = count
+		case "accepted":
+			orderSummary.Accepted = count
+		case "packed":
+			orderSummary.Packed = count
+		case "ready":
+			orderSummary.Ready = count
+		case "completed":
+			orderSummary.Completed = count
+		case "cancelled":
+			orderSummary.Cancelled = count
+		case "rejected":
+			orderSummary.Rejected = count
+		default:
+			// Handle any unexpected status values
+			break
 		}
 	}
 
-	return
+	// Check for any row iteration errors
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return orderSummary, nil
 }
 
 func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
@@ -63,33 +70,35 @@ func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 	// Main query to get order details with delivery partner and customer info
 	mainQuery := `
 		SELECT 
-			o.pickup_pin as delivery_partner_pin,
-			dp.name as delivery_partner_name,
-			dp.phone_number as delivery_partner_phone,
+			db.pin as delivery_partner_pin,
+			db.full_name as delivery_partner_name,
+			db.phone as delivery_partner_phone,
 			o.pack_by_time,
-			o.paid_by_time,
-			o.delivered_by_time,
-			o.id as order_id,
-			o.customer_name,
-			CONCAT(a.address_line1, ', ', a.address_line2, ', ', a.city, ', ', a.state, ' ', a.postal_code) as customer_address,
+			o.paid_time,
+			o.delivery_time,
+			o.order_id,
+			c.full_name as customer_name,
+			CONCAT(ca.address_line1, ', ', ca.address_line2, ', ', ca.city, ', ', ca.state, ' ', ca.postal_code) as customer_address,
 			o.order_time as order_created_time,
-			o.total_amount as order_total_amount
-		FROM orders.orders o
-		LEFT JOIN delivery_partners.delivery_partners dp ON o.delivery_partner_id = dp.id
-		LEFT JOIN user_profile.addresses a ON o.customer_address_id = a.id
-		WHERE o.id = $1`
+			o.amount as order_total_amount
+		FROM quickkart.customer.orders o
+		LEFT JOIN quickkart.delivery.order_tracker dt ON o.order_id = dt.order_id
+		LEFT JOIN quickkart.profile.delivery_boy db ON dt.delivery_boy_id = db.id
+		LEFT JOIN quickkart.profile.customer c ON o.customer_id = c.id
+		LEFT JOIN quickkart.profile.customer_addresses ca ON c.id = ca.customer_id AND ca.is_default = true
+		WHERE o.order_id = $1`
 
 	var response vendors.OrderDetailsResponse
 	var deliveryPartnerPin, deliveryPartnerName, deliveryPartnerPhone *string
-	var packByTime, paidByTime, deliveredByTime *time.Time
+	var packByTime, paidTime, deliveryTime *time.Time
 
 	err := pgPool.QueryRow(ctx, mainQuery, orderID).Scan(
 		&deliveryPartnerPin,
 		&deliveryPartnerName,
 		&deliveryPartnerPhone,
 		&packByTime,
-		&paidByTime,
-		&deliveredByTime,
+		&paidTime,
+		&deliveryTime,
 		&response.OrderID,
 		&response.CustomerName,
 		&response.CustomerAddress,
@@ -109,38 +118,30 @@ func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
 	response.DeliveryPartnerName = deliveryPartnerName
 	response.DeliveryPartnerPhone = deliveryPartnerPhone
 	response.PackByTime = packByTime
-	response.PaidByTime = paidByTime
-	response.DeliveredByTime = deliveredByTime
+	response.PaidByTime = paidTime
+	response.DeliveredByTime = deliveryTime
 
-	// Get current order status (latest status from logs)
+	// Get current order status from the orders table
 	statusQuery := `
 		SELECT status 
-		FROM orders.order_status_logs 
-		WHERE order_id = $1
-		ORDER BY changed_at DESC 
-		LIMIT 1`
+		FROM quickkart.customer.orders 
+		WHERE order_id = $1`
 
 	err = pgPool.QueryRow(ctx, statusQuery, orderID).Scan(&response.OrderStatus)
 	if err != nil {
-		// If no status logs exist, use order.status as fallback
-		fallbackQuery := `SELECT status FROM orders.orders WHERE id = $1`
-		err = pgPool.QueryRow(ctx, fallbackQuery, orderID).Scan(&response.OrderStatus)
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 
 	// Get order items
 	itemsQuery := `
 		SELECT 
-			i.id as item_id,
-			ii.image_url as item_image_url,
-			i.name as item_name,
-			oi.quantity as qty_ordered
-		FROM orders.order_items oi
-		JOIN vendor_items.items i ON oi.item_id = i.id
-		JOIN vendor_items.item_images ii ON oi.item_id = ii.item_id
-		WHERE oi.order_id = $1`
+			gi.item_id,
+			gi.image_url_1 as item_image_url,
+			gi.title as item_name,
+			coi.qty as qty_ordered
+		FROM quickkart.customer.order_items coi
+		JOIN quickkart.master.grocery_items gi ON coi.item_id = gi.item_id
+		WHERE coi.order_id = $1`
 
 	rows, err := pgPool.Query(ctx, itemsQuery, orderID)
 	if err != nil {
@@ -211,36 +212,35 @@ func GetVendorOrders(vendorID string, page, limit int) (*vendors.OrdersListRespo
 	// Calculate offset
 	offset := (page - 1) * limit
 
-	// Get total count first
+	// Get total count first - count orders assigned to this vendor
 	var totalCount int
-	countQuery := `SELECT COUNT(*) FROM orders.orders WHERE account_id = $1::uuid`
+	countQuery := `
+        SELECT COUNT(DISTINCT o.order_id) 
+        FROM quickkart.customer.orders o
+        INNER JOIN quickkart.vendor.order_pickup_assignments opa ON o.order_id = opa.order_id
+        WHERE opa.vendor_id = $1::uuid`
 	err := pgPool.QueryRow(ctx, countQuery, vendorID).Scan(&totalCount)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get orders with latest status from order_status_logs
+	// Get orders assigned to this vendor
 	ordersQuery := `
-		WITH latest_status AS (
-			SELECT 
-				order_id, 
-				status,
-				ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY changed_at DESC) as rn
-			FROM orders.order_status_logs
-		)
-		SELECT 
-			o.id::text as order_id,
-			o.status as order_status,
-			o.customer_name,
-			o.order_time as order_time_placed,
-			o.total_amount,
-			o.pack_by_time,
-			o.delivered_by_time,
-			o.pack_by_time as pick_by_time
-		FROM orders.orders o
-		WHERE o.account_id = $1::uuid
-		ORDER BY o.order_time DESC
-		LIMIT $2 OFFSET $3`
+       SELECT 
+          o.order_id::text as order_id,
+          o.status as order_status,
+          c.full_name as customer_name,
+          o.order_time as order_time_placed,
+          o.amount as total_amount,
+          o.pack_by_time,
+          o.delivery_time as delivered_by_time,
+          o.pack_by_time as pick_by_time
+       FROM quickkart.customer.orders o
+       INNER JOIN quickkart.vendor.order_pickup_assignments opa ON o.order_id = opa.order_id
+       LEFT JOIN quickkart.profile.customer c ON o.customer_id = c.id
+       WHERE opa.vendor_id = $1::uuid
+       ORDER BY o.order_time DESC
+       LIMIT $2 OFFSET $3`
 
 	rows, err := pgPool.Query(ctx, ordersQuery, vendorID, limit, offset)
 	if err != nil {

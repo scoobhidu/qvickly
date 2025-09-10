@@ -1,8 +1,9 @@
 package vendors
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Item represents an item that vendors can add to their inventory
@@ -23,6 +24,10 @@ type Item struct {
 	SearchKeywords *string    `json:"search_keywords" db:"search_keywords"`
 	IsActive       bool       `json:"is_active" db:"is_active"`
 	VendorName     *string    `json:"vendor_name,omitempty"`
+	ImageURL1      *string    `json:"image_url_1,omitempty"`
+	ImageURL2      *string    `json:"image_url_2,omitempty"`
+	ImageURL3      *string    `json:"image_url_3,omitempty"`
+	Mrp            *string    `json:"mrp,omitempty"`
 }
 
 // SearchFilters represents the available search filters

@@ -7,7 +7,7 @@ import (
 
 func GetVendorProfile(phoneNumber, password string) (vendorDetails *vendors.VendorProfileDetails, err error) {
 	vendorDetails = new(vendors.VendorProfileDetails)
-	err = pgPool.QueryRow(context.Background(), `SELECT id, image_url, business_name, owner_name, live_status FROM postgres.vendor_accounts.vendor_accounts where phone_number=$1 and password=$2`, phoneNumber, password).Scan(&vendorDetails.VendorId, &vendorDetails.ImageS3URL, &vendorDetails.StoreName, &vendorDetails.OwnerName, &vendorDetails.StoreLiveStatus)
+	err = pgPool.QueryRow(context.Background(), `SELECT id, image_url, business_name, owner_name, is_active FROM quickkart.profile.vendors where phone=$1 and password=$2`, phoneNumber, password).Scan(&vendorDetails.VendorId, &vendorDetails.ImageS3URL, &vendorDetails.StoreName, &vendorDetails.OwnerName, &vendorDetails.StoreLiveStatus)
 	if err != nil {
 		vendorDetails = nil
 	}
@@ -22,7 +22,7 @@ func AddVendorProfile(data vendors.CompleteVendorProfile) (err error) {
 }
 
 func GetProfileVendorStatus(vendorId string) (status bool, err error) {
-	err = pgPool.QueryRow(context.Background(), `SELECT live_status FROM postgres.vendor_accounts.vendor_accounts where id=$1::uuid`, vendorId).Scan(&status)
+	err = pgPool.QueryRow(context.Background(), `SELECT is_active FROM quickkart.profile.vendors where vendor_id=$1::uuid`, vendorId).Scan(&status)
 	if err != nil {
 		status = false
 	}
