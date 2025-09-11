@@ -19,7 +19,7 @@ func LoginC(req user.LoginRequest) (user.CustomerData, error) {
 	query := `SELECT id, full_name, phone, email, ca.latitude, ca.longitude, ca.title, COALESCE(ca.address_line1, ca.address_line2, ca.city, ca.state, ca.country, ca.postal_code)  FROM quickkart.profile.customer left join quickkart.profile.customer_addresses ca on customer.id = ca.customer_id WHERE phone = $1 and ca.is_default=true`
 
 	err := pgPool.QueryRow(ctx, query, req.Phone).Scan(
-		&customer.ID, &customer.FullName, &customer.Phone, &customer.Email)
+		&customer.ID, &customer.FullName, &customer.Phone, &customer.Email, &customer.Latitude, &customer.Longitude, &customer.Title, &customer.Address)
 
 	return customer, err
 }

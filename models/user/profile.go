@@ -14,10 +14,14 @@ type LoginResponse struct {
 }
 
 type CustomerData struct {
-	ID       string `json:"id"`
-	FullName string `json:"full_name"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
+	ID        string  `json:"id"`
+	FullName  string  `json:"full_name"`
+	Phone     string  `json:"phone"`
+	Email     string  `json:"email"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Title     string  `json:"title"`
+	Address   string  `json:"address"`
 }
 
 type AddAddressRequest struct {
