@@ -289,3 +289,29 @@ func GetOrderStatus(c *gin.Context) {
 		Order:   &order,
 	})
 }
+
+// Get All Customer Addresses API
+func GetCustomerAddresses(c *gin.Context) {
+	customerID := c.Query("customer_id")
+	if customerID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Customer ID is required",
+		})
+		return
+	}
+	cID, err := uuid.Parse(customerID)
+	addresses, err := postgres.GetAddresses(cID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, user.OrderStatusResponse{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":   true,
+		"message":   "Addresses fetched successfully",
+		"addresses": addresses,
+	})
+	return
+}

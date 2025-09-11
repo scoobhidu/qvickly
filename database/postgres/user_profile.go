@@ -7,6 +7,7 @@ import (
 	"qvickly/models/user"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -15,7 +16,7 @@ func LoginC(req user.LoginRequest) (user.CustomerData, error) {
 
 	// Check if customer exists
 	var customer user.CustomerData
-	query := `SELECT id, full_name, phone, email FROM quickkart.profile.customer WHERE phone = $1`
+	query := `SELECT id, full_name, phone, email, ca.latitude, ca.longitude, ca.title, COALESCE(ca.address_line1, ca.address_line2, ca.city, ca.state, ca.country, ca.postal_code)  FROM quickkart.profile.customer left join quickkart.profile.customer_addresses ca on customer.id = ca.customer_id WHERE phone = $1 and ca.is_default=true`
 
 	err := pgPool.QueryRow(ctx, query, req.Phone).Scan(
 		&customer.ID, &customer.FullName, &customer.Phone, &customer.Email)
@@ -132,4 +133,59 @@ func GetOrderStatus(orderID uuid.UUID) (user.OrderStatus, error) {
 	}
 
 	return order, err
+}
+
+func GetAddresses(customerID uuid.UUID) (addresses []gin.H, err error) {
+	ctx := context.Background()
+
+	query := `
+		SELECT address_id, title, address_line1, address_line2, city, state, 
+			   postal_code, country, latitude, longitude, is_default, created_at
+		FROM quickkart.profile.customer_addresses 
+		WHERE customer_id = $1
+		ORDER BY is_default DESC, created_at DESC`
+
+	rows, err := pgPool.Query(ctx, query, customerID)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var addressID, title, addressLine1, city, state, postalCode, country string
+		var addressLine2 *string
+		var latitude, longitude *float64
+		var isDefault bool
+		var createdAt time.Time
+
+		err := rows.Scan(
+			&addressID, &title, &addressLine1, &addressLine2, &city, &state,
+			&postalCode, &country, &latitude, &longitude, &isDefault, &createdAt,
+		)
+		if err != nil {
+			continue
+		}
+
+		address := gin.H{
+			"address_id":    addressID,
+			"title":         title,
+			"address_line1": addressLine1,
+			"address_line2": addressLine2,
+			"city":          city,
+			"state":         state,
+			"postal_code":   postalCode,
+			"country":       country,
+			"latitude":      latitude,
+			"longitude":     longitude,
+			"is_default":    isDefault,
+			"created_at":    createdAt,
+		}
+		addresses = append(addresses, address)
+	}
+
+	if err = rows.Err(); err != nil {
+		return
+	}
+
+	return
 }
