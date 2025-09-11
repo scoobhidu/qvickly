@@ -82,6 +82,16 @@ func Router(app *gin.Engine) {
 		group.GET("/subcategories/items", user_ec2.GetItemsByCategory)
 		group.GET("/subcategories/items/filter", user_ec2.GetItemsByFilter)
 		group.POST("/place_order", user_ec2.PlaceOrder)
-	}
+		// Customer routes
+		group.POST("/login", user_ec2.LoginCustomer)
+		group.POST("/:customer_id/address", user_ec2.AddCustomerAddress)
+		group.PUT("/:customer_id/address/default", user_ec2.MarkAddressDefault)
 
+		// Coupon routes
+		group.GET("/coupons", user_ec2.GetCoupons)
+		//group.POST("/order/apply-coupon", user_ec2.ApplyCoupon)
+
+		// Order routes
+		group.GET("/order/:order_id/status", user_ec2.GetOrderStatus)
+	}
 }
