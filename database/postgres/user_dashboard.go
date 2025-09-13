@@ -3,10 +3,11 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"qvickly/models/user"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetDashboardItems() []user.CategoryWithItems {
@@ -129,6 +130,56 @@ func GetItemsBySubCategory(c *gin.Context, err error, categoryID int, limit int,
 		WHERE subcategory_id = $1 
 		ORDER BY title 
 		LIMIT $2 OFFSET $3`, categoryID, limit, offset)
+	if err != nil {
+		return make([]user.GroceryItem, 0), true
+	}
+	defer rows.Close()
+
+	var items []user.GroceryItem
+	for rows.Next() {
+		var item user.GroceryItem
+		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.Mrp, &item.ImageURL1)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan item"})
+			return make([]user.GroceryItem, 0), true
+		}
+		items = append(items, item)
+	}
+	return items, false
+}
+
+func GetDailyEssentialItems(c *gin.Context) ([]user.GroceryItem, bool) {
+	rows, err := pgPool.Query(context.Background(), `
+		SELECT item_id, title, description, price_wholesale, price_retail, mrp, COALESCE(image_url_1, '') as image_url_1 
+		FROM quickkart.master.grocery_items 
+		WHERE daily_essential = true 
+		ORDER BY title 
+		LIMIT 30`)
+	if err != nil {
+		return make([]user.GroceryItem, 0), true
+	}
+	defer rows.Close()
+
+	var items []user.GroceryItem
+	for rows.Next() {
+		var item user.GroceryItem
+		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.Mrp, &item.ImageURL1)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan item"})
+			return make([]user.GroceryItem, 0), true
+		}
+		items = append(items, item)
+	}
+	return items, false
+}
+
+func GetHotItems(c *gin.Context) ([]user.GroceryItem, bool) {
+	rows, err := pgPool.Query(context.Background(), `
+		SELECT item_id, title, description, price_wholesale, price_retail, mrp, COALESCE(image_url_1, '') as image_url_1 
+		FROM quickkart.master.grocery_items 
+		WHERE hot_products = true 
+		ORDER BY title 
+		LIMIT 30`)
 	if err != nil {
 		return make([]user.GroceryItem, 0), true
 	}

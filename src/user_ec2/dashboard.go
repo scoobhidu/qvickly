@@ -1,10 +1,11 @@
 package user_ec2
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"qvickly/database/postgres"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 1. Get categories with max 5 items each
@@ -49,6 +50,26 @@ func GetItemsByCategory(c *gin.Context) {
 	offset, _ := strconv.Atoi(offsetStr)
 
 	items, _ := postgres.GetItemsBySubCategory(c, err, categoryID, limit, offset)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   items,
+	})
+}
+
+// Optional: Get items by category ID with pagination
+func GetDailyEssentialItems(c *gin.Context) {
+	items, _ := postgres.GetDailyEssentialItems(c)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   items,
+	})
+}
+
+// Optional: Get items by category ID with pagination
+func GetHotItems(c *gin.Context) {
+	items, _ := postgres.GetHotItems(c)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
