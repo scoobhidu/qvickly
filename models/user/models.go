@@ -25,6 +25,11 @@ type GroceryItem struct {
 	ImageURL1      string  `json:"image_url_1"`
 }
 
+type RecentSearch struct {
+	Search    string `json:"search"`
+	CreatedAt string `json:"created_at"`
+}
+
 type CategoryWithItems struct {
 	ID    int           `json:"id"`
 	Name  string        `json:"name"`

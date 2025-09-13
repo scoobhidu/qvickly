@@ -198,6 +198,30 @@ func GetHotItems(c *gin.Context) ([]user.GroceryItem, bool) {
 	return items, false
 }
 
+func GetRecentSearches(c *gin.Context, cID string) ([]user.RecentSearch, bool) {
+	rows, err := pgPool.Query(context.Background(), `
+		SELECT search_term, created_at
+		FROM quickkart.profile.user_recent_searches
+		where customer_id = $1::uuid
+		LIMIT 3`, cID)
+	if err != nil {
+		return make([]user.RecentSearch, 0), true
+	}
+	defer rows.Close()
+
+	var items []user.RecentSearch
+	for rows.Next() {
+		var item user.RecentSearch
+		err := rows.Scan(&item.Search, &item.CreatedAt)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan item"})
+			return make([]user.RecentSearch, 0), true
+		}
+		items = append(items, item)
+	}
+	return items, false
+}
+
 func GetItemsByFilter(categoryID int, minPrice, maxPrice int, searchQuery string, limit int, offset int) ([]user.GroceryItem, bool) {
 	// Build dynamic query based on filters
 	query := `SELECT item_id, title, description, price_wholesale, price_retail, mrp, COALESCE(image_url_1, '') as image_url_1 

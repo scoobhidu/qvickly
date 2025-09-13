@@ -95,6 +95,7 @@ func Router(app *gin.Engine) {
 
 		// Order routes
 		group.GET("/order/:order_id/status", user_ec2.GetOrderStatus)
+		group.GET("recent_searches", user_ec2.GetRecentSearches)
 		group.GET("/addresses", user_ec2.GetCustomerAddresses)
 	}
 }

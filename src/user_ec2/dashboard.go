@@ -78,6 +78,16 @@ func GetHotItems(c *gin.Context) {
 }
 
 // Optional: Get items by category ID with pagination
+func GetRecentSearches(c *gin.Context) {
+	items, _ := postgres.GetRecentSearches(c, c.Query("customer_id"))
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   items,
+	})
+}
+
+// Optional: Get items by category ID with pagination
 func GetItemsByFilter(c *gin.Context) {
 	categoryIDStr := c.DefaultQuery("subcategory_id", "1")
 	categoryID, err := strconv.Atoi(categoryIDStr)
