@@ -43,6 +43,18 @@ func AddCAddress(req user.AddAddressRequest, customerID uuid.UUID) (err error) {
 	return err
 }
 
+func AddUser(req user.SignUpRequest) (cID string, err error) {
+	ctx := context.Background()
+
+	queryRow := `
+		INSERT INTO quickkart.profile.customer (
+			phone, full_name, email
+		) VALUES ($1, coalesce($2, $3), $4) returning id`
+	err = pgPool.QueryRow(ctx, queryRow, req.Phone, req.FirstName, req.LastName, req.Email).Scan(&cID)
+
+	return
+}
+
 func SetDefaultAddress(req user.MarkDefaultRequest, customerID uuid.UUID) (err error) {
 	ctx := context.Background()
 

@@ -81,6 +81,33 @@ func AddCustomerAddress(c *gin.Context) {
 	})
 }
 
+// 2. Add Customer Address API
+func SignUp(c *gin.Context) {
+	var req user.SignUpRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, user.AddressResponse{
+			Success: false,
+			Message: "Invalid request format",
+		})
+		return
+	}
+
+	data, err := postgres.AddUser(req)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, user.AddressResponse{
+			Success: false,
+			Message: "Failed to add address",
+		})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"success":     true,
+		"customer_id": data,
+		"message":     "user added successfully",
+	})
+}
+
 // 3. Mark Address as Default API
 func MarkAddressDefault(c *gin.Context) {
 	customerID := c.Param("customer_id")
