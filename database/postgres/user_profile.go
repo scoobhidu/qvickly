@@ -33,7 +33,14 @@ func AddCAddress(req user.AddAddressRequest, customerID uuid.UUID) (err error) {
 			address_id, customer_id, title, address_line1, address_line2, 
 			city, state, postal_code, country, latitude, longitude, 
 			is_default, created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, false, $12, $12)`
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CASE 
+				WHEN NOT EXISTS (
+					SELECT 1 
+					FROM quickkart.profile.customer_addresses 
+					WHERE customer_id = $2
+				) THEN true 
+				ELSE false 
+, $12, $12)`
 
 	_, err = pgPool.Exec(ctx, query,
 		addressID, customerID, req.Title, req.AddressLine1, req.AddressLine2,
