@@ -306,7 +306,10 @@ func SearchItemsByFilter(minPrice, maxPrice int, searchQuery string, limit int, 
 		query += fmt.Sprintf(` AND (
            LOWER(title) ILIKE $%d OR 
            LOWER(description) ILIKE $%d OR 
-           LOWER(search_keywords) ILIKE $%d
+           EXISTS (
+			   SELECT 1 FROM unnest(search_keywords) AS keyword 
+			   WHERE LOWER(keyword) ILIKE $%d
+		   )
        )`, argIndex, argIndex, argIndex)
 		searchTerm := "%" + strings.ToLower(searchQuery) + "%"
 		args = append(args, searchTerm)
