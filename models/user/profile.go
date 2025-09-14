@@ -45,9 +45,9 @@ type SignUpRequest struct {
 }
 
 type AddressResponse struct {
-	Success   bool    `json:"success"`
-	Message   string  `json:"message"`
-	AddressID *string `json:"address_id,omitempty"`
+	Success   bool   `json:"success"`
+	Message   string `json:"message"`
+	AddressID int    `json:"address_id,omitempty"`
 }
 
 type MarkDefaultRequest struct {

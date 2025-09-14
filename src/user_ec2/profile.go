@@ -66,12 +66,13 @@ func AddCustomerAddress(c *gin.Context) {
 
 	cID, err := uuid.Parse(customerID)
 
-	err = postgres.AddCAddress(req, cID)
+	addressId, err := postgres.AddCAddress(req, cID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, user.AddressResponse{
-			Success: false,
-			Message: "Failed to add address",
+			Success:   false,
+			AddressID: addressId,
+			Message:   "Failed to add address",
 		})
 		return
 	}
