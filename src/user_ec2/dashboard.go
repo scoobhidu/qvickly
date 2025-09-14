@@ -125,3 +125,35 @@ func GetItemsByFilter(c *gin.Context) {
 		"data":   items,
 	})
 }
+
+// Optional: Get items by category ID with pagination
+func SearchItemsByFilter(c *gin.Context) {
+	// Get pagination parameters
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
+
+	minP := c.DefaultQuery("min_price", "def")
+	maxP := c.DefaultQuery("max_price", "def")
+
+	searchQuery := c.DefaultQuery("search", "")
+
+	minPrice := -1
+	maxPrice := -1
+
+	if minP != "def" {
+		minPrice, _ = strconv.Atoi(minP)
+	}
+	if maxP != "def" {
+		maxPrice, _ = strconv.Atoi(maxP)
+	}
+
+	limit, _ := strconv.Atoi(limitStr)
+	offset, _ := strconv.Atoi(offsetStr)
+
+	items, _ := postgres.SearchItemsByFilter(minPrice, maxPrice, searchQuery, limit, offset)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   items,
+	})
+}

@@ -83,6 +83,7 @@ func Router(app *gin.Engine) {
 		group.GET("/subcategories/items/daily_essential", user_ec2.GetDailyEssentialItems)
 		group.GET("/subcategories/items/hot", user_ec2.GetHotItems)
 		group.GET("/subcategories/items/filter", user_ec2.GetItemsByFilter)
+		group.GET("/subcategories/items/search", user_ec2.SearchItemsByFilter)
 		group.POST("/place_order", user_ec2.PlaceOrder)
 
 		// Customer routes

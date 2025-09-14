@@ -278,3 +278,60 @@ func GetItemsByFilter(categoryID int, minPrice, maxPrice int, searchQuery string
 	}
 	return items, false
 }
+
+func SearchItemsByFilter(minPrice, maxPrice int, searchQuery string, limit int, offset int) ([]user.GroceryItem, bool) {
+	// Build dynamic query based on filters
+	query := `SELECT item_id, title, description, price_wholesale, price_retail, mrp, COALESCE(image_url_1, '') as image_url_1 
+             FROM quickkart.master.grocery_items 
+             WHERE 1=1`
+
+	var args []interface{}
+	argIndex := 1
+
+	// Add price range filters
+	if minPrice != -1 {
+		query += fmt.Sprintf(" AND price_retail >= $%d", argIndex)
+		args = append(args, minPrice)
+		argIndex++
+	}
+
+	if maxPrice != -1 {
+		query += fmt.Sprintf(" AND price_retail <= $%d", argIndex)
+		args = append(args, maxPrice)
+		argIndex++
+	}
+
+	// Add search query filter
+	if searchQuery != "" {
+		query += fmt.Sprintf(` AND (
+           LOWER(title) ILIKE $%d OR 
+           LOWER(description) ILIKE $%d OR 
+           LOWER(search_keywords) ILIKE $%d
+       )`, argIndex, argIndex, argIndex)
+		searchTerm := "%" + strings.ToLower(searchQuery) + "%"
+		args = append(args, searchTerm)
+		argIndex++
+	}
+
+	// Add ordering and pagination
+	query += fmt.Sprintf(" ORDER BY title LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
+	args = append(args, limit, offset)
+
+	// Execute query
+	rows, err := pgPool.Query(context.Background(), query, args...)
+	if err != nil {
+		return make([]user.GroceryItem, 0), true
+	}
+	defer rows.Close()
+
+	var items []user.GroceryItem
+	for rows.Next() {
+		var item user.GroceryItem
+		err := rows.Scan(&item.ID, &item.Title, &item.Description, &item.PriceWholesale, &item.PriceRetail, &item.Mrp, &item.ImageURL1)
+		if err != nil {
+			return make([]user.GroceryItem, 0), true
+		}
+		items = append(items, item)
+	}
+	return items, false
+}
