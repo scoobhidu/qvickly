@@ -247,7 +247,7 @@ func DeleteInventoryItem(vendorID string, itemID int) (err error) {
 
 func GetItemCategories() (categories []vendors.Category, err error) {
 	ctx := context.Background()
-	rows, err := pgPool.Query(ctx, `select c.title, sc.title, sc.grocery_subcategory_id from quickkart.master.grocery_categories c right join quickkart.master.grocery_subcategories sc on sc.grocery_category_id = c.grocery_category_id`)
+	rows, err := pgPool.Query(ctx, `select s.title, sc.title, sc.subcategory_id from quickkart.master.grocery_items sc left join quickkart.master.grocery_subcategories s on sc.subcategory_id = s.grocery_subcategory_id`)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to fetch categories"})
 		return
