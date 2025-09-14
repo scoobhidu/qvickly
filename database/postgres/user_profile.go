@@ -26,24 +26,23 @@ func LoginC(req user.LoginRequest) (user.CustomerData, error) {
 
 func AddCAddress(req user.AddAddressRequest, customerID uuid.UUID) (err error) {
 	ctx := context.Background()
-	addressID := uuid.New()
 
 	query := `
 		INSERT INTO quickkart.profile.customer_addresses (
-			address_id, customer_id, title, address_line1, address_line2, 
+			customer_id, title, address_line1, address_line2, 
 			city, state, postal_code, country, latitude, longitude, 
-			is_default, created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CASE 
+			created_at, updated_at, is_default
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11, CASE 
 				WHEN NOT EXISTS (
 					SELECT 1 
 					FROM quickkart.profile.customer_addresses 
-					WHERE customer_id = $2
+					WHERE customer_id = $1
 				) THEN true 
-				ELSE false 
-, $12, $12)`
+				ELSE false
+				END)`
 
 	_, err = pgPool.Exec(ctx, query,
-		addressID, customerID, req.Title, req.AddressLine1, req.AddressLine2,
+		customerID, req.Title, req.AddressLine1, req.AddressLine2,
 		req.City, req.State, req.PostalCode, req.Country,
 		req.Latitude, req.Longitude, time.Now())
 
