@@ -26,8 +26,10 @@ func PlaceOrder(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Vendor not found"})
+			return
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error" + err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error | " + err.Error()})
+			return
 		}
 	}
 	// Calculate estimated delivery time (vendor distance + delivery distance)

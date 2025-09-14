@@ -125,7 +125,7 @@ func createOrder(tx pgx.Tx, orderID, customerID uuid.UUID, amount float64) error
             order_id, customer_id, order_time, amount, status
         ) VALUES ($1, $2, $3, $4, $5)`
 
-	_, err := tx.Exec(context.Background(), query, orderID, customerID, time.Now(), amount, "placed")
+	_, err := tx.Exec(context.Background(), query, orderID, customerID, time.Now(), amount, "pending")
 	return err
 }
 
