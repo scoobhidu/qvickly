@@ -16,15 +16,15 @@ func LoginC(req user.LoginRequest) (user.CustomerData, error) {
 
 	// Check if customer exists
 	var customer user.CustomerData
-	query := `SELECT id, full_name, phone, email, ca.latitude, ca.longitude, ca.title, COALESCE(ca.address_line1, ca.address_line2, ca.city, ca.state, ca.country, ca.postal_code)  FROM quickkart.profile.customer left join quickkart.profile.customer_addresses ca on customer.id = ca.customer_id WHERE phone = $1 and ca.is_default=true`
+	query := `SELECT id, full_name, phone, email, ca.latitude, ca.longitude, ca.title, COALESCE(ca.address_line1, ca.address_line2, ca.city, ca.state, ca.country, ca.postal_code), address_id  FROM quickkart.profile.customer left join quickkart.profile.customer_addresses ca on customer.id = ca.customer_id WHERE phone = $1 and ca.is_default=true`
 
 	err := pgPool.QueryRow(ctx, query, req.Phone).Scan(
-		&customer.ID, &customer.FullName, &customer.Phone, &customer.Email, &customer.Latitude, &customer.Longitude, &customer.Title, &customer.Address)
+		&customer.ID, &customer.FullName, &customer.Phone, &customer.Email, &customer.Latitude, &customer.Longitude, &customer.Title, &customer.Address, &customer.AddressId)
 
 	return customer, err
 }
 
-func AddCAddress(req user.AddAddressRequest, customerID uuid.UUID) (err error) {
+func AddCAddress(req user.AddAddressRequest, customerID uuid.UUID) (addressId int, err error) {
 	ctx := context.Background()
 
 	query := `
@@ -39,14 +39,14 @@ func AddCAddress(req user.AddAddressRequest, customerID uuid.UUID) (err error) {
 					WHERE customer_id = $1
 				) THEN true 
 				ELSE false
-				END)`
+				END) returning address_id`
 
-	_, err = pgPool.Exec(ctx, query,
+	err = pgPool.QueryRow(ctx, query,
 		customerID, req.Title, req.AddressLine1, req.AddressLine2,
 		req.City, req.State, req.PostalCode, req.Country,
-		req.Latitude, req.Longitude, time.Now())
+		req.Latitude, req.Longitude, time.Now()).Scan(&addressId)
 
-	return err
+	return
 }
 
 func AddUser(req user.SignUpRequest) (cID string, err error) {

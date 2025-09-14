@@ -22,6 +22,7 @@ type CustomerData struct {
 	Longitude float64 `json:"longitude"`
 	Title     string  `json:"title"`
 	Address   string  `json:"address"`
+	AddressId string  `json:"address_id"`
 }
 
 type AddAddressRequest struct {
