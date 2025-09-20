@@ -82,7 +82,7 @@ func GetInventoryItemsPagination(vendorID string, categoryID string, search stri
 			i.image_url_1,
 			vi.qty, vi.qty > 0 as is_available,
 			COALESCE(vi.wholesale_price_override, i.price_retail) as price, i.price_wholesale,
-			CASE WHEN vi.stock_quantity = 0 THEN true ELSE false END as out_of_stock
+			CASE WHEN vi.qty = 0 THEN true ELSE false END as out_of_stock
 		` + baseQuery + `
 		ORDER BY i.title ASC
 		LIMIT $` + strconv.Itoa(argIndex) + ` OFFSET $` + strconv.Itoa(argIndex+1)

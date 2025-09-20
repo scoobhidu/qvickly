@@ -16,7 +16,7 @@ func GetVendorProfile(phoneNumber, password string) (vendorDetails *vendors.Vend
 }
 
 func AddVendorProfile(data vendors.CompleteVendorProfile) (err error) {
-	_, err = pgPool.Exec(context.Background(), `INSERT INTO quickkart.profile.vendors(phone, account_type, business_name, owner_name, address, latitude, longitude, gstin_number, opening_time, closing_time, image_url, is_active) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, data.Phone, data.AccountType, data.BusinessName, data.OwnerName, data.Address, data.Latitude, data.Longitude, data.GSTIN, data.OpeningTime, data.ClosingTime, data.ImageS3URL, data.StoreLiveStatus)
+	_, err = pgPool.Exec(context.Background(), `INSERT INTO quickkart.profile.vendors(phone, password, aadhar, account_type, business_name, owner_name, address, latitude, longitude, gstin_number, opening_time, closing_time, image_url, is_active) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, data.Phone, data.Password, data.Aadhar, data.AccountType, data.BusinessName, data.OwnerName, data.Address, data.Latitude, data.Longitude, data.GSTIN, data.OpeningTime, data.ClosingTime, data.ImageS3URL, data.StoreLiveStatus)
 
 	return
 }

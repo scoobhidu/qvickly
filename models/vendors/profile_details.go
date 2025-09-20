@@ -20,6 +20,8 @@ type ProfileRequestBody struct {
 // CompleteVendorProfile represents comprehensive vendor profile information
 type CompleteVendorProfile struct {
 	Phone           string    `json:"phone" db:"phone" example:"+1234567890" description:"Primary contact phone number for the vendor"`
+	Password        string    `json:"password" db:"password" example:"rajat" description:"Password for vendor login"`
+	Aadhar          int       `json:"aadhar" db:"aadhar" example:"387161235819" enums:"aadhar" description:"Aadhar of vendor"`
 	AccountType     string    `json:"account_type" db:"account_type" example:"premium" enums:"basic,premium,enterprise" description:"Type of vendor account subscription"`
 	BusinessName    string    `json:"business_name" db:"business_name" example:"Smith's Fresh Market LLC" description:"Official registered business name"`
 	OwnerName       string    `json:"owner_name" db:"owner_name" example:"John Smith" description:"Full name of the business owner"`

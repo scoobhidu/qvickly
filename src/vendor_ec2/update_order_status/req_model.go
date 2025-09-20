@@ -5,8 +5,8 @@ var ValidOrderStatuses = map[string]bool{
 	"pending":   true,
 	"accepted":  true,
 	"packed":    true,
-	"ready":     true,
-	"completed": true,
+	"picked":    true,
+	"delivered": true,
 	"cancelled": true,
 	"rejected":  true,
 }

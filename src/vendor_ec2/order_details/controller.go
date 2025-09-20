@@ -1,9 +1,9 @@
 package order_details
 
 import (
-	"github.com/gin-gonic/gin"
 	"qvickly/database/postgres"
-	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // GetVendorOrderDetail godoc
@@ -24,8 +24,7 @@ func GetVendorOrderDetail(ctx *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(orderID)
-	orderDetails, err := postgres.GetVendorOrderDetails(id)
+	orderDetails, err := postgres.GetVendorOrderDetails(orderID)
 	if err != nil {
 		if err.Error() == "order not found" {
 			ctx.JSON(500, gin.H{"error": "order not found"})

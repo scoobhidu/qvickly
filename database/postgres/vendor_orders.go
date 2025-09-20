@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"qvickly/models/vendors"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func GetVendorTodaysOrderSummary(vendorId string) (orderSummary *vendors.TodayOrderSummary, err error) {
@@ -64,7 +65,7 @@ func GetVendorTodaysOrderSummary(vendorId string) (orderSummary *vendors.TodayOr
 	return orderSummary, nil
 }
 
-func GetVendorOrderDetails(orderID int) (*vendors.OrderDetailsResponse, error) {
+func GetVendorOrderDetails(orderID string) (*vendors.OrderDetailsResponse, error) {
 	ctx := context.Background()
 
 	// Main query to get order details with delivery partner and customer info
@@ -181,27 +182,29 @@ func UpdateOrderStatus(orderID, newStatus string) error {
 
 	if newStatus == "pending" {
 		_, err = pgPool.Exec(ctx,
-			`UPDATE orders.orders SET status = $1, updated_at = $2, pack_by_time = $2 WHERE id = $3`,
+			`UPDATE quickkart.customer.orders SET status = $1, updated_at = $2, pack_by_time = $3 WHERE order_id = $4`,
 			newStatus, updateTime, updateTime.Add(time.Minute*12), orderID)
 	} else {
 		_, err = pgPool.Exec(ctx,
-			`UPDATE orders.orders SET status = $1, updated_at = $2 WHERE id = $3`,
+			`UPDATE quickkart.customer.orders SET status = $1, updated_at = $2 WHERE order_id = $3`,
 			newStatus, updateTime, orderID)
 	}
 
-	if err != nil {
-		return err
+	if newStatus == "picked" {
+		_, err = pgPool.Exec(ctx,
+			`UPDATE quickkart.vendor.order_pickup_assignments SET picked_up = true WHERE order_id = $1`,
+			orderID)
 	}
 
 	// Insert into status logs
-	_, err = pgPool.Exec(ctx,
-		`INSERT INTO orders.order_status_logs (order_id, status, changed_at) 
-			 VALUES ($1, $2, $3)
-			 ON CONFLICT (order_id) 
-			 DO UPDATE SET 
-				status = EXCLUDED.status,
-				changed_at = EXCLUDED.changed_at;`,
-		orderID, newStatus, updateTime)
+	//_, err = pgPool.Exec(ctx,
+	//	`INSERT INTO orders.order_status_logs (order_id, status, changed_at)
+	//		 VALUES ($1, $2, $3)
+	//		 ON CONFLICT (order_id)
+	//		 DO UPDATE SET
+	//			status = EXCLUDED.status,
+	//			changed_at = EXCLUDED.changed_at;`,
+	//	orderID, newStatus, updateTime)
 
 	return err
 }
